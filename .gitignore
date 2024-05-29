@@ -1,0 +1,13 @@
+# root files
+*.root
+
+#datacards
+*.txt
+
+#swap files
+*.swp
+*/__pycache__/*
+
+#plots
+*.png
+*.pdf
