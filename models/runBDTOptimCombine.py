@@ -1,4 +1,5 @@
 import ROOT
+ROOT.gROOT.SetBatch(0)
 import mplhep as hep
 import matplotlib.pyplot as plt
 plt.style.use([hep.style.ROOT, hep.style.firamath])
@@ -120,6 +121,7 @@ if (args.step == 'all' or args.step == 'plot'):
     import cmsstyle as CMS
     CMS.SetLumi('2022, 34.4')
     CMS.SetEnergy('13.6')
+    CMS.AppendAdditionalInfo(args.datacard_tag)
     
     legend = CMS.cmsLeg(0.15, 0.70, 0.50, 0.90)
 
@@ -162,7 +164,9 @@ if (args.step == 'all' or args.step == 'plot'):
             exit(-1)
         sensitivity_rdf =  ROOT.RDataFrame('sensitivity_tree', args.scan_sensitivity)
         sensitivity_np  = (ROOT.RDataFrame('sensitivity_tree', args.scan_sensitivity)).AsNumpy()
-        Punzi_S = sensitivity_np['PunziS_val'] 
+
+        Punzi_S = sensitivity_np['PunziS_val']
+        print(Punzi_S)
 
         #punzi_graph = sensitivity_rdf.Graph('bdt_cut', 'PunziS_val').GetPtr()
         #punzi_graph.SetMarkerColor(ROOT.kRed)
@@ -184,7 +188,7 @@ if (args.step == 'all' or args.step == 'plot'):
         ax2 = ax1.twinx()
 
         ax1.plot(bdt_cut_list[:len(results_np['limit'])], results_np['limit'],              'bo--', linewidth=2, markersize=8, label =f'expUL ({args.CL*100}% CL)')
-        ax2.plot(bdt_cut_list[:len(results_np['limit'])], sensitivity_np['PunziS_val'],     'ro--', linewidth=2, markersize=8, label =f'Punzi sig.')
+        ax2.plot(sensitivity_np['bdt_cut'], sensitivity_np['PunziS_val'],     'ro--', linewidth=2, markersize=8, label =f'Punzi sig.')
         ax1.set_ylabel(f'exp UL ({args.CL * 100} % CL) x 1e-7')
         ax2.set_ylabel(f'Punzi significance')
         ax1.set_xlabel('BDT threshold')
