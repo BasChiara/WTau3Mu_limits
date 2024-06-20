@@ -10,6 +10,7 @@ DATA='/eos/user/c/cbasile/Tau3MuRun3/data/mva_data/XGBout_data_kFold_HLT_overlap
 
 # 2022
 CATEGORY_LIST=("A" "B" "C")
+CATEGORY_LIST=("C")
 for CATEGORY in ${CATEGORY_LIST[@]}; do
     echo -e "\n----------------"
     echo    "|  CATEGORY $CATEGORY  |"
@@ -25,5 +26,5 @@ for CATEGORY in ${CATEGORY_LIST[@]}; do
     #python3 $BASE_DIR/models/compareLimitScan.py --inputs input_combine/Tau3MuCombine.WTau3Mu_$CATEGORY${YEAR}_BDTscan.AsymptoticLimits.root --labels AsymptoticLimits --inputs input_combine/Tau3MuCombine.WTau3Mu_$CATEGORY${YEAR}_BDTscan.HybridNew.root --labels HybridNew -o $EOS_DIR -d WTau3Mu_$CATEGORY${YEAR} -n WTau3Mu_$CATEGORY${YEAR} -y 20$YEAR
 
     # compare with expo-only bkg fit
-    python3 $BASE_DIR/models/compareLimitScan.py --inputs input_combine/Tau3MuCombine.WTau3Mu_$CATEGORY${YEAR}_BDTscan.AsymptoticLimits.root --labels 'AL-expo/const' --inputs input_combine/Tau3MuCombine.WTau3Mu_$CATEGORY${YEAR}_BDTscan.HybridNew.root --labels 'HN-expo/const' --inputs ../binBDT_LxyS1.5_HLT_overlap_2024May27/input_combine/Tau3MuCombine.WTau3Mu_$CATEGORY${YEAR}_BDTscan.AsymptoticLimits.root --labels AL-expo --inputs ../binBDT_LxyS1.5_HLT_overlap_2024May27/input_combine/Tau3MuCombine.WTau3Mu_$CATEGORY${YEAR}_BDTscan.HybridNew.root --labels HN-expo -o $EOS_DIR -t HNvsAL_expoVSconst -d WTau3Mu_$CATEGORY${YEAR} -n WTau3Mu_$CATEGORY${YEAR} -y 20$YEAR
+    python3 $BASE_DIR/models/compareLimitScan.py --inputs input_combine/Tau3MuCombine.WTau3Mu_$CATEGORY${YEAR}_BDTscan.AsymptoticLimits.root --labels 'AL-const' --inputs input_combine/Tau3MuCombine.WTau3Mu_$CATEGORY${YEAR}_BDTscan.HybridNew.root --labels 'HN-const' --inputs ../binBDT_LxyS1.5_HLT_overlap_2024May27/input_combine/Tau3MuCombine.WTau3Mu_$CATEGORY${YEAR}_BDTscan.AsymptoticLimits.root --labels AL-expo --inputs ../binBDT_LxyS1.5_HLT_overlap_2024May27/input_combine/Tau3MuCombine.WTau3Mu_$CATEGORY${YEAR}_BDTscan.HybridNew.root --labels HN-expo -o $EOS_DIR -t HNvsAL_expoVSconst -d WTau3Mu_$CATEGORY${YEAR} -n WTau3Mu_$CATEGORY${YEAR} -y 20$YEAR
 done
