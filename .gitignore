@@ -11,3 +11,8 @@
 #plots
 *.png
 *.pdf
+
+#log files
+*combine_logger.out
+#zip
+*.tar.gz

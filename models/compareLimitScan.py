@@ -44,6 +44,9 @@ CMS.AppendAdditionalInfo(args.datacard_tag)
 root_color_list = [ROOT.kBlue, ROOT.kRed, ROOT.kMagenta-7, ROOT.kGreen+2, ROOT.kOrange+7]
 legend = CMS.cmsLeg(0.5, 0.70, 0.75, 0.90)
 
+min_BDT_val = 0.9900-0.0005
+max_BDT_val = 1.0 
+
 min_lim_val = []
 max_lim_val = []
 graphs = []
@@ -64,8 +67,8 @@ for i, f in enumerate(args.inputs):
 print(min_lim_val)
 c = CMS.cmsCanvas(
     'c',
-    0.9900 - 0.0005,
-    1.0,
+    min_BDT_val,
+    max_BDT_val,
     0.9*np.min(min_lim_val),
     1.1*np.max(max_lim_val),
     'BDTcut',f'expUL ({args.CL*100} % CL)',
