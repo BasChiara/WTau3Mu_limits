@@ -14,5 +14,10 @@
 
 #log files
 *combine_logger.out
+
+# condor files
+*jobs_report/
+*cbasile.cc
+
 #zip
 *.tar.gz
