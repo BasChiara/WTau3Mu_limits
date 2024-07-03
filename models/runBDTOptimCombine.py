@@ -8,6 +8,10 @@ import os
 import numpy as np
 import argparse
 
+import sys
+sys.path.append('/afs/cern.ch/user/c/cbasile/WTau3MuRun3_Analysis/CMSSW_13_0_13/src/Tau3MuAnalysis')
+from mva.config import LumiVal_plots 
+
 parser = argparse.ArgumentParser()
 parser.add_argument('-i', '--input_dir',                                                    default = 'binBDT_LxyS1.5_HLT_overlap_2024Apr29')
 parser.add_argument('-o', '--plotout_dir',                                                  default = '/eos/user/c/cbasile/www/Tau3Mu_Run3/BDTtraining/cut_LxySign/')
@@ -119,15 +123,16 @@ if (args.step == 'all' or args.step == 'merge'):
 if (args.step == 'all' or args.step == 'plot'):
     ROOT.gStyle.SetOptStat(0)
     import cmsstyle as CMS
-    CMS.SetLumi('2022, 34.4')
+    lumi = LumiVal_plots['20'+ args.year]
+    CMS.SetLumi(f'2022, {lumi}')
     CMS.SetEnergy('13.6')
     CMS.AppendAdditionalInfo(args.datacard_tag)
     
     legend = CMS.cmsLeg(0.15, 0.70, 0.50, 0.90)
-
+    # limit results
     results_rdf = ROOT.RDataFrame(tree_name, merge_file)
     results_np  = results_rdf.Filter('quantileExpected==0.5').AsNumpy()
-    limit_graph = results_rdf.Filter('quantileExpected==0.5').Graph('bdt_cut', 'limit').GetPtr()
+    limit_graph = results_rdf.Filter(f'quantileExpected==0.5 & bdt_cut > {bdt_cut_list[0]} & bdt_cut < {bdt_cut_list[-1]}').Graph('bdt_cut', 'limit').GetPtr()
     limit_graph.SetMarkerColor(ROOT.kBlue)
     limit_graph.SetMarkerStyle(20)
     limit_graph.SetLineColor(ROOT.kBlue)
@@ -137,8 +142,8 @@ if (args.step == 'all' or args.step == 'plot'):
         'c',
         bdt_cut_list[0] - 0.0005,
         1.0,
-        0.9*np.min(results_np['limit']),
-        1.1*np.max(results_np['limit']),
+        0.8*np.min(results_np['limit']),
+        1.2*np.max(results_np['limit']),
         'BDTcut',f'expUL ({args.CL*100} %)',
         square=CMS.kRectangular,extraSpace=0.01,iPos=0.0,scaleLumi=0.80
     )
@@ -187,6 +192,8 @@ if (args.step == 'all' or args.step == 'plot'):
         )
         ax2 = ax1.twinx()
 
+        print(results_np['bdt_cut'].isin(bdt_cut_list))
+        exit()
         ax1.plot(bdt_cut_list[:len(results_np['limit'])], results_np['limit'],              'bo--', linewidth=2, markersize=8, label =f'expUL ({args.CL*100}% CL)')
         ax2.plot(sensitivity_np['bdt_cut'], sensitivity_np['PunziS_val'],     'ro--', linewidth=2, markersize=8, label =f'Punzi sig.')
         ax1.set_ylabel(f'exp UL ({args.CL * 100} % CL) x 1e-7')

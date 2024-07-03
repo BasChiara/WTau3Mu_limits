@@ -8,18 +8,24 @@ plt.style.use([hep.style.ROOT, hep.style.firamath])
 
 import os
 import numpy as np
+
+import sys
+sys.path.append('/afs/cern.ch/user/c/cbasile/WTau3MuRun3_Analysis/CMSSW_13_0_13/src/Tau3MuAnalysis')
+from mva.config import LumiVal_plots 
+
 import argparse
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-i','--inputs',             action='append')
 parser.add_argument('-l','--labels',             action='append')
-parser.add_argument('-x', '--comp_by',      choices=['bdt_cut', 'expNb'],         default='bdt_cut')
+parser.add_argument('-x', '--comp_by',           choices=['bdt_cut', 'expNb'],    default='bdt_cut')
 parser.add_argument('--input_sensititvity')
 parser.add_argument('-o', '--plotout_dir',                                        default = 'WTau3Mu')
 parser.add_argument('-t', '--tag',                                                default = '')
 parser.add_argument('-d', '--datacard_tag',                                       default = 'WTau3Mu')
 parser.add_argument('-n', '--name_combine',                                       default = '/eos/user/c/cbasile/www/Tau3Mu_Run3/BDTtraining/cut_LxySign/Training_kFold_HLT_overlap_LxyS1.5_2024May27/bdt_scan/')
-parser.add_argument('-y', '--year',                                               default = '2022')
+parser.add_argument('-y', '--year',             choices=['2022', '2023'],         default = '2022')
+parser.add_argument('-c', '--category',         choices=['A', 'B', 'C'],          default = 'A')
 parser.add_argument('--CL',                 type =float,                          default = 0.90)
 
 args = parser.parse_args()
@@ -35,11 +41,11 @@ if Nfiles != Nlabels:
 tree_name = 'limit'
 
 # setup canvas
-CMS.SetLumi(f'{args.year}, 34.4')
+CMS.SetLumi(f'{args.year}, {LumiVal_plots[args.year]}')
 CMS.SetEnergy('13.6')
 CMS.SetExtraText("Preliminary")
 CMS.ResetAdditionalInfo()
-CMS.AppendAdditionalInfo(args.datacard_tag)
+CMS.AppendAdditionalInfo(f'W#rightarrow#tau(3#mu)#nu CAT {args.category}')
 #CMS.SetCMSPalette() NOT working
 root_color_list = [ROOT.kBlue, ROOT.kRed, ROOT.kMagenta-7, ROOT.kGreen+2, ROOT.kOrange+7]
 legend = CMS.cmsLeg(0.5, 0.70, 0.75, 0.90)
@@ -87,43 +93,3 @@ legend.Draw()
 c.SaveAs(f'{plotout_dir}/ULscan_{tag}.png')
 c.SaveAs(f'{plotout_dir}/ULscan_{tag}.pdf')
 
-#AL_file   = args.input_AL#'/eos/user/c/cbasile/CombineTools/CMSSW_11_3_4/src/WTau3Mu_limits/bdt_cut_optimization/binBDT_LxyS1.5_HLT_overlap_2024May27_bkgModel/input_combine/Tau3MuCombine.WTau3Mu_A22_BDTscan.AsymptoticLimits.root'
-#HN_file   = args.input_HN#'/eos/user/c/cbasile/CombineTools/CMSSW_11_3_4/src/WTau3Mu_limits/bdt_cut_optimization/binBDT_LxyS1.5_HLT_overlap_2024May27_bkgModel/input_combine/Tau3MuCombine.WTau3Mu_A22_BDTscan.HybridNew.root'
-
-#resultsAL_rdf = ROOT.RDataFrame(tree_name, AL_file)
-#limits_AL = (resultsAL_rdf.Filter('quantileExpected==0.5').AsNumpy())['limit']
-#resultsHN_rdf = ROOT.RDataFrame(tree_name, HN_file)
-#limits_HN = (resultsHN_rdf.Filter('quantileExpected==0.5').AsNumpy())['limit']
-#
-#
-#limitAL_graph = resultsAL_rdf.Filter('quantileExpected==0.5').Graph('bdt_cut', 'limit').GetPtr()
-#limitAL_graph.SetMarkerColor(ROOT.kBlue)
-#limitAL_graph.SetMarkerStyle(20)
-#limitAL_graph.SetLineColor(ROOT.kBlue)
-#limitAL_graph.SetMarkerSize(1.5)
-#legend.AddEntry(limitAL_graph, 'AsymptoticLimits')
-#
-#limitHN_graph = resultsHN_rdf.Filter('quantileExpected==0.5').Graph('bdt_cut', 'limit').GetPtr()
-#limitHN_graph.SetMarkerColor(ROOT.kRed)
-#limitHN_graph.SetMarkerStyle(20)
-#limitHN_graph.SetLineColor(ROOT.kRed)
-#limitHN_graph.SetMarkerSize(1.5)
-#legend.AddEntry(limitHN_graph, 'HybridNew')
-#
-#CMS.cmsDraw(limitAL_graph, 
-#    'LP',
-#    marker = limitAL_graph.GetMarkerStyle(),
-#    mcolor = limitAL_graph.GetMarkerColor(), 
-#    fcolor = limitAL_graph.GetFillColor(),
-#    fstyle = limitAL_graph.GetFillStyle(), 
-#)
-#CMS.cmsDraw(limitHN_graph, 
-#    'LP same',
-#    marker = limitHN_graph.GetMarkerStyle(),
-#    mcolor = limitHN_graph.GetMarkerColor(), 
-#    fcolor = limitHN_graph.GetFillColor(),
-#    fstyle = limitHN_graph.GetFillStyle(), 
-#)
-#legend.Draw()
-#c.SaveAs(f'{plotout_dir}/ULscan_BDT_ALvsHN_{tag}.png')
-#c.SaveAs(f'{plotout_dir}/ULscan_BDT_ALvsHN_{tag}.pdf')
