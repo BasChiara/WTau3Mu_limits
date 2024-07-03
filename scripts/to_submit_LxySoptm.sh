@@ -6,7 +6,6 @@ WORKDIR="$COMBINEv10/WTau3Mu_limits/bdt_cut_optimization"
 PLOT_DIR="/eos/user/c/cbasile/www/Tau3Mu_Run3/BDTtraining/cut_LxySign"
 
 CUT_LIST=(1.4 1.5 1.7 1.9 2.0)
-CUT_LIST=(1.4 1.7 1.9 2.0)
 for CUT in ${CUT_LIST[@]}; do
     echo -e "\n .... submitting jobs for LxyS > ${CUT} \n"
     TAG="kFold_HLT_overlap_LxyS${CUT}_2024May27"
