@@ -1,6 +1,9 @@
 # root files
 *.root
 
+#BDT-optimization
+bdt_cut_optimization/binBDT*
+
 #datacards
 *.txt
 
