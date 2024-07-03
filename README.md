@@ -25,5 +25,8 @@ scram b
 git clone git@github.com:BasChiara/WTau3Mu_limits.git WTau3Mu_limits
 cd WTau3Mu_limits
 ```
-**RUN MVA SELECTION OPTIMIZATION**
+**RUN MVA SELECTION OPTIMIZATION**\
 You can run the optimization over the 3 categories in parallel using HTCondor. Use the script `scripts/to_submit_BDToptim.sh` which calls `scripts/submitBDTopt_onCondor.py`, modify the tag and the I/O directories before using it.
+
+**BIAS STUDY (~Hggtautau approach)**\
+In `bias_study` folder there are some scripts to produce bias test 
