@@ -94,7 +94,7 @@ echo -e "\n"
 echo    "|  CATEGORY $CATEGORY  |"
 echo -e "\n"
 echo 'TIME TO FIT'
-python3 $BASE_DIR/Tau3Mu_fitSB.py --plot_outdir $EOS_DIR --combine_dir $COMBINE_DIR -s $SIGNAL -d $DATA --category $CATEGORY -y $YEAR --tag $TAG --optim_bdt --save_ws --bkg_func dynamic --BDTmin 0.9900 --BDTmax 0.9995 --BDTstep 0.0005
+#python3 $BASE_DIR/Tau3Mu_fitSB.py --plot_outdir $EOS_DIR --combine_dir $COMBINE_DIR -s $SIGNAL -d $DATA --category $CATEGORY -y $YEAR --tag $TAG --optim_bdt --save_ws --bkg_func dynamic --BDTmin 0.9900 --BDTmax 0.9995 --BDTstep 0.0005
 echo 'TIME TO CALCULATE LIMITS'
 # with AsymptoticLimits
 python3 $BASE_DIR/runBDTOptimCombine.py -i $COMBINE_DIR -o $EOS_DIR --scan_sensitivity input_combine/sensitivity_tree_bdt_scan_{full_tag}.root -d {full_tag} -n {full_tag} --BDTmin 0.9900 --BDTmax 0.9995 --BDTstep 0.0005 -s all
