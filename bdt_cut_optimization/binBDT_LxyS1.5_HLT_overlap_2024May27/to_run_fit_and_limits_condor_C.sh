@@ -10,10 +10,10 @@ TAG="HLT_overlap_LxyS1.5_2024May27"
 
 COMBINE_DIR="$WORK_DIR/input_combine"
 
-EOS_DIR="/eos/user/c/cbasile/www/Tau3Mu_Run3/BDTtraining/cut_LxySign/Training_kFold_HLT_overlap_LxyS1.5_2024May27/bdt_scan/"
+EOS_DIR="/eos/user/c/cbasile/www/Tau3Mu_Run3/BDTtraining/cut_LxySign/Training_kFold_HLT_overlap_Optuna_LxyS1.5_2024Jun28/bdt_scan/"
 YEAR="22"
-SIGNAL="/eos/user/c/cbasile/Tau3MuRun3/data/mva_data/XGBout_signal_kFold_HLT_overlap_LxyS1.5_2024May27.root"
-DATA="/eos/user/c/cbasile/Tau3MuRun3/data/mva_data/XGBout_data_kFold_HLT_overlap_LxyS1.5_2024May27.root"
+SIGNAL="/eos/user/c/cbasile/Tau3MuRun3/data/mva_data/XGBout_signal_kFold_HLT_overlap_Optuna_LxyS1.5_2024Jun28.root"
+DATA="/eos/user/c/cbasile/Tau3MuRun3/data/mva_data/XGBout_data_kFold_HLT_overlap_Optuna_LxyS1.5_2024Jun28.root"
 
 CATEGORY="C"
 
