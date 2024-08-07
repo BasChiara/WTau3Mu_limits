@@ -66,7 +66,7 @@ def zip_jobScripts(options):
     return tar_ball_name
 
 
-def setup_executable(exe_file, tar_scripts, category, options):
+def setup_executable(exe_file, category, options):
 
     # dump the text datacard
     with open(exe_file, 'w') as exe:
@@ -77,7 +77,6 @@ def setup_executable(exe_file, tar_scripts, category, options):
 WORK_DIR="{workdir}"
 BASE_DIR="{basedir}/models/"
 cd {workdir}
-#tar -xvzf {scripts} -C $BASE_DIR
 
 TAG="{tag}"
 
@@ -99,14 +98,13 @@ echo 'TIME TO CALCULATE LIMITS'
 # with AsymptoticLimits
 python3 $BASE_DIR/runBDTOptimCombine.py -i $COMBINE_DIR -o $EOS_DIR --scan_sensitivity input_combine/sensitivity_tree_bdt_scan_{full_tag}.root -d {full_tag} -n {full_tag} --BDTmin 0.9900 --BDTmax 0.9995 --BDTstep 0.0005 -s all
 # with HybridNew 
-python3 $BASE_DIR/runBDTOptimCombine.py -i $COMBINE_DIR -o $EOS_DIR --scan_sensitivity input_combine/sensitivity_tree_bdt_scan_WTau3Mu_{full_tag}.root -d {full_tag} -n {full_tag} -M HybridNew --BDTmin 0.9900 --BDTmax 0.9995 --BDTstep 0.0005 -s all
+python3 $BASE_DIR/runBDTOptimCombine.py -i $COMBINE_DIR -o $EOS_DIR --scan_sensitivity input_combine/sensitivity_tree_bdt_scan_{full_tag}.root -d {full_tag} -n {full_tag} -M HybridNew --BDTmin 0.9900 --BDTmax 0.9995 --BDTstep 0.0005 -s all
 echo 'TIME TO COMPARE THE METHODS'
 # compare the methods
 python3 $BASE_DIR/compareLimitScan.py --inputs input_combine/Tau3MuCombine.{full_tag}_BDTscan.AsymptoticLimits.root --labels AsymptoticLimits --inputs input_combine/Tau3MuCombine.{full_tag}_BDTscan.HybridNew.root --labels HybridNew -o $EOS_DIR -d {full_tag} -n {full_tag} -y 20$YEAR -c $CATEGORY
     '''.format(
         workdir = os.path.abspath(options.workdir),
-        basedir = os.getcwd(),
-        scripts = tar_scripts,
+        basedir = os.getcwd(), 
         tag     = options.tag,
         eos     = options.plot_outdir,
         year    = options.year,
@@ -174,7 +172,7 @@ def main():
     else:
         print(f'[+] working-directory aleardy exists : {opt.workdir}')
     # --> tarball with scripts to run
-    scripts = zip_jobScripts(opt)
+    #scripts = zip_jobScripts(opt)
     # --> setup the ouput directory
     if not os.path.isdir(opt.plot_outdir):
         os.system(f'mkdir -p {opt.plot_outdir}')
@@ -203,7 +201,7 @@ def main():
     
         # --> setup the executable
         executable_file_path = f'{opt.workdir}/{opt.application}_{cat}.sh'
-        setup_executable(executable_file_path, scripts, cat, opt)
+        setup_executable(executable_file_path, cat, opt)
         # --> setup the command sequence to run
         src_filename = f'{jobdir}/src/submit_{str(i)}.src'
         with open(src_filename, 'w') as src:

@@ -132,7 +132,7 @@ if (args.step == 'all' or args.step == 'plot'):
     # limit results
     results_rdf = ROOT.RDataFrame(tree_name, merge_file)
     results_np  = results_rdf.Filter('quantileExpected==0.5').AsNumpy()
-    limit_graph = results_rdf.Filter(f'quantileExpected==0.5 & bdt_cut > {bdt_cut_list[0]} & bdt_cut < {bdt_cut_list[-1]}').Graph('bdt_cut', 'limit').GetPtr()
+    limit_graph = results_rdf.Filter(f'quantileExpected==0.5 & bdt_cut > {bdt_cut_list[0]} & (bdt_cut < ({bdt_cut_list[-1]} + {args.BDTstep/2.}) )').Graph('bdt_cut', 'limit').GetPtr()
     limit_graph.SetMarkerColor(ROOT.kBlue)
     limit_graph.SetMarkerStyle(20)
     limit_graph.SetLineColor(ROOT.kBlue)
@@ -172,13 +172,6 @@ if (args.step == 'all' or args.step == 'plot'):
 
         Punzi_S = sensitivity_np['PunziS_val']
         print(Punzi_S)
-
-        #punzi_graph = sensitivity_rdf.Graph('bdt_cut', 'PunziS_val').GetPtr()
-        #punzi_graph.SetMarkerColor(ROOT.kRed)
-        #punzi_graph.SetMarkerStyle(20)
-        #punzi_graph.SetLineColor(ROOT.kRed)
-        #punzi_graph.SetMarkerSize(1.5)
-        #legend.AddEntry(punzi_graph, f'Punzi sign.')
 
         fig, ax1 = plt.subplots(figsize = (12,8))
         hep.cms.label(
