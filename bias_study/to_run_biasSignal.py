@@ -5,8 +5,8 @@ sys.path.append('..')
 import style.color_text as ct
 
 dry_run = False
-do_gen_step     = False
-do_fit_step     = False
+do_gen_step     = True
+do_fit_step     = True
 do_pull_step    = True
 
 # signal strength to generate toys
