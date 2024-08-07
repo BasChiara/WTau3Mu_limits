@@ -1,0 +1,22 @@
+
+imax 1 number of channels
+jmax * number of background sources
+kmax * number of nuisance parameters
+--------------------------------------------------------------------------------
+shapes bkg         WTau3Mu_B22       wspace_bdt0.9970_WTau3Mu_B22_LxyS2.1_2024Jul11_const.root wspace_WTau3Mu_B22_LxyS2.1_2024Jul11_const_bdt0.9970:model_bkg_WTau3Mu_B22
+shapes sig         WTau3Mu_B22       wspace_bdt0.9970_WTau3Mu_B22_LxyS2.1_2024Jul11_const.root wspace_WTau3Mu_B22_LxyS2.1_2024Jul11_const_bdt0.9970:model_sig_WTau3Mu_B22
+shapes data_obs    WTau3Mu_B22       wspace_bdt0.9970_WTau3Mu_B22_LxyS2.1_2024Jul11_const.root wspace_WTau3Mu_B22_LxyS2.1_2024Jul11_const_bdt0.9970:data_obs
+--------------------------------------------------------------------------------
+bin                WTau3Mu_B22
+observation        -1
+--------------------------------------------------------------------------------
+bin                              WTau3Mu_B22         WTau3Mu_B22
+process                          sig                 bkg
+process                          0                   1
+rate                             1.9220              13.2724
+--------------------------------------------------------------------------------
+lumi               lnN           1.022               -
+bkgNorm_WTau3Mu_B22     rateParam     WTau3Mu_B22              bkg      1.      [0.43,1.95]
+bkgNorm_WTau3Mu_B22     flatParam
+#slope_WTau3Mu_B22       param  -1.0000 0.0000
+    
