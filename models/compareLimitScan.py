@@ -28,6 +28,7 @@ parser.add_argument('-y', '--year',             choices=['2022', '2023'],       
 parser.add_argument('-c', '--category',         choices=['A', 'B', 'C'],          default = 'A')
 parser.add_argument('--CL',                 type =float,                          default = 0.90)
 
+
 args = parser.parse_args()
 tag = '_'.join([args.comp_by, args.tag, args.name_combine])
 plotout_dir = args.plotout_dir
@@ -53,15 +54,17 @@ legend = CMS.cmsLeg(0.5, 0.70, 0.75, 0.90)
 min_BDT_val = 0.9900-0.0005
 max_BDT_val = 1.0 
 
-min_lim_val = []
-max_lim_val = []
+min_lim_val = 100
+max_lim_val = 0
 graphs = []
 for i, f in enumerate(args.inputs):
     print(f'[+] {f}')
     rdf = ROOT.RDataFrame(tree_name, f).Filter('quantileExpected==0.5')
-    limits = rdf.AsNumpy()['limit']
-    min_lim_val.append(np.min(limits))
-    max_lim_val.append(np.max(limits))
+    limits  = rdf.AsNumpy()['limit']
+    bdt_cut = rdf.AsNumpy()['bdt_cut']
+    min_BDT_val = np.min([min_BDT_val, np.min(bdt_cut)-0.0005])
+    min_lim_val = np.min([min_lim_val, np.min(limits)])
+    max_lim_val = np.max([max_lim_val, np.max(limits)])
 
     limit_graph = rdf.Graph(args.comp_by, 'limit').GetPtr()
     limit_graph.SetMarkerColor(root_color_list[i])
@@ -75,8 +78,8 @@ c = CMS.cmsCanvas(
     'c',
     min_BDT_val,
     max_BDT_val,
-    0.9*np.min(min_lim_val),
-    1.1*np.max(max_lim_val),
+    0.9*min_lim_val,
+    1.1*max_lim_val,
     'BDTcut',f'expUL ({args.CL*100} % CL)',
     square=CMS.kRectangular,extraSpace=0.02,iPos=11,scaleLumi=0.80
 )

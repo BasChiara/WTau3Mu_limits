@@ -170,26 +170,28 @@ if (args.step == 'all' or args.step == 'plot'):
         sensitivity_rdf =  ROOT.RDataFrame('sensitivity_tree', args.scan_sensitivity)
         sensitivity_np  = (ROOT.RDataFrame('sensitivity_tree', args.scan_sensitivity)).AsNumpy()
 
-        Punzi_S = sensitivity_np['PunziS_val']
-        print(Punzi_S)
-
         fig, ax1 = plt.subplots(figsize = (12,8))
         hep.cms.label(
-            #label = "Preliminary", 
+            label = "Preliminary", 
             data = True, 
-            year = 2022,
-            lumi = 34.7,
-            #com  = 13.6, 
+            year = '20' + args.year,
+            lumi = LumiVal_plots['20'+ args.year],
+            com  = 13.6, 
             loc=0, 
             ax=ax1
         )
         ax2 = ax1.twinx()
 
-        print(results_np['bdt_cut'].isin(bdt_cut_list))
-        exit()
-        ax1.plot(bdt_cut_list[:len(results_np['limit'])], results_np['limit'],              'bo--', linewidth=2, markersize=8, label =f'expUL ({args.CL*100}% CL)')
-        ax2.plot(sensitivity_np['bdt_cut'], sensitivity_np['PunziS_val'],     'ro--', linewidth=2, markersize=8, label =f'Punzi sig.')
-        ax1.set_ylabel(f'exp UL ({args.CL * 100} % CL) x 1e-7')
+        #print(results_np['bdt_cut'].isin(bdt_cut_list))
+        #exit()
+        #ax1.plot(bdt_cut_list[:len(results_np['limit'])], results_np['limit'],              'bo--', linewidth=2, markersize=8, label =f'expUL ({args.CL*100}% CL)')
+        ax1.errorbar(bdt_cut_list[:len(results_np['limit'])], results_np['limit'], yerr = results_np['limitErr'], fmt='bo--', linewidth=2, markersize=8, label =f'expUL')
+        ax2.errorbar(sensitivity_np['bdt_cut'], sensitivity_np['PunziS_val'], yerr = sensitivity_np['PunziS_err'], fmt='ro--', linewidth=2, markersize=8, label =f'Punzi signifince')
+        ax1.set_ylim(0.8*np.min(results_np['limit']), 1.2*np.max(results_np['limit']))
+        ax2.set_ylim(0.0, 0.30)
+        # add text with process info
+        #ax2.plot(sensitivity_np['bdt_cut'], sensitivity_np['PunziS_val'],     'ro--', linewidth=2, markersize=8, label =f'Punzi sig.')
+        ax1.set_ylabel(f'exp UL ({args.CL * 100} % CL) '+ r'$\times 10^{-7}$')
         ax2.set_ylabel(f'Punzi significance')
         ax1.set_xlabel('BDT threshold')
         ax1.set_xticks(np.arange(args.BDTmin, args.BDTmax, 2*args.BDTstep))

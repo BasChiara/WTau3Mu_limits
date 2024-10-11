@@ -36,7 +36,6 @@ toy_tag          = f'.gen{opt.nToys/1000:,.0f}K{opt.gen_func}_{opt.tag}'
 toys_file_name   = f'toys{toy_tag}'
 
 # I am not using it
-#  ----- find the best background fit function with descrete profiling
 #if opt.mode == "setup":
 
 #    # Get list of pdfindeices
@@ -63,13 +62,12 @@ toys_file_name   = f'toys{toy_tag}'
 #    with open("pdfindex.json","w") as jf:
 #        json.dump(pdf_index_bf, jf)
 
-# --- generate nToys toys with the background function in the datacard
 if opt.mode == "generate":
     
     cmd = f'combine -m {opt.MH} -d {opt.input_datacard} -M GenerateOnly --setParameters Mtau={opt.MH} --freezeParameters Mtau --expectSignal 0 -n {toy_tag}  --saveToys -t {opt.nToys} -s -1\n\n'
     print(cmd)
     if not opt.dry_run : os.system(cmd)
-    if not os.path.isdir('/toys') : os.system('mkdir toys')
+
     cmd = f'mv higgsCombine{toy_tag}* ./toys/{toys_file_name}.root'
     if not opt.dry_run : os.system(cmd)
 

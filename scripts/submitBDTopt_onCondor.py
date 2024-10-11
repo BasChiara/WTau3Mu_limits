@@ -92,13 +92,12 @@ CATEGORY="{cat}"
 echo -e "\n"
 echo    "|  CATEGORY $CATEGORY  |"
 echo -e "\n"
-echo 'TIME TO FIT'
-#python3 $BASE_DIR/Tau3Mu_fitSB.py --plot_outdir $EOS_DIR --combine_dir $COMBINE_DIR -s $SIGNAL -d $DATA --category $CATEGORY -y $YEAR --tag $TAG --optim_bdt --save_ws --bkg_func dynamic --BDTmin 0.9900 --BDTmax 0.9995 --BDTstep 0.0005
+
 echo 'TIME TO CALCULATE LIMITS'
 # with AsymptoticLimits
-python3 $BASE_DIR/runBDTOptimCombine.py -i $COMBINE_DIR -o $EOS_DIR --scan_sensitivity input_combine/sensitivity_tree_bdt_scan_{full_tag}.root -d {full_tag} -n {full_tag} --BDTmin 0.9900 --BDTmax 0.9995 --BDTstep 0.0005 -s all
+python3 $BASE_DIR/runBDTOptimCombine.py -i $COMBINE_DIR -o $EOS_DIR --scan_sensitivity input_combine/sensitivity_tree_bdt_scan_{full_tag}.root -d {full_tag} -n {full_tag} --BDTmin {bdt_min} --BDTmax {bdt_max} --BDTstep {bdt_step} -s all
 # with HybridNew 
-python3 $BASE_DIR/runBDTOptimCombine.py -i $COMBINE_DIR -o $EOS_DIR --scan_sensitivity input_combine/sensitivity_tree_bdt_scan_{full_tag}.root -d {full_tag} -n {full_tag} -M HybridNew --BDTmin 0.9900 --BDTmax 0.9995 --BDTstep 0.0005 -s all
+python3 $BASE_DIR/runBDTOptimCombine.py -i $COMBINE_DIR -o $EOS_DIR --scan_sensitivity input_combine/sensitivity_tree_bdt_scan_{full_tag}.root -d {full_tag} -n {full_tag} -M HybridNew --BDTmin {bdt_min} --BDTmax {bdt_max} --BDTstep {bdt_step} -s all
 echo 'TIME TO COMPARE THE METHODS'
 # compare the methods
 python3 $BASE_DIR/compareLimitScan.py --inputs input_combine/Tau3MuCombine.{full_tag}_BDTscan.AsymptoticLimits.root --labels AsymptoticLimits --inputs input_combine/Tau3MuCombine.{full_tag}_BDTscan.HybridNew.root --labels HybridNew -o $EOS_DIR -d {full_tag} -n {full_tag} -y 20$YEAR -c $CATEGORY
@@ -111,7 +110,10 @@ python3 $BASE_DIR/compareLimitScan.py --inputs input_combine/Tau3MuCombine.{full
         signal  = options.signal,
         data    = options.data,
         cat     = category,
-        full_tag= f'WTau3Mu_{category}{options.year}_{options.tag}'
+        full_tag= f'WTau3Mu_{category}{options.year}_{options.tag}',
+        bdt_min = options.BDTmin,
+        bdt_max = options.BDTmax,
+        bdt_step= options.BDTstep,
     )
     )
 
@@ -153,6 +155,9 @@ def main():
     parser.add_option('--plot_outdir',       action='store',            dest='plot_outdir',             help='copy the output plot in the specified EOS path',          default = '')
     parser.add_option('--category',          choices=['A', 'B', 'C', 'ABC'],   dest='category',        help='events category',                                         default = 'A')
     parser.add_option('--year',              choices=['22', '23'],      dest='year',            help='data taking year',                                        default = '22')
+    parser.add_option('--BDTmin',            action='store',            dest='BDTmin',          help='minimum BDT value',                                       default = 0.9800) 
+    parser.add_option('--BDTmax',            action='store',            dest='BDTmax',          help='maximum BDT value',                                       default = 0.9980)
+    parser.add_option('--BDTstep',           action='store',            dest='BDTstep',         help='step for BDT scan',                                       default = 0.0010)
     parser.add_option('--debug',             action='store_true',       dest='debug',           help='useful printouts',                                        default = False)
     (opt, args) = parser.parse_args()
 
@@ -200,7 +205,7 @@ def main():
     for i, cat in enumerate(categories):
     
         # --> setup the executable
-        executable_file_path = f'{opt.workdir}/{opt.application}_{cat}.sh'
+        executable_file_path = f'{opt.workdir}/{opt.application}_{cat}{opt.year}.sh'
         setup_executable(executable_file_path, cat, opt)
         # --> setup the command sequence to run
         src_filename = f'{jobdir}/src/submit_{str(i)}.src'
