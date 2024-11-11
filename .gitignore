@@ -4,6 +4,9 @@
 #BDT-optimization
 bdt_cut_optimization/binBDT*
 
+# results
+results/*
+
 #datacards
 *.txt
 
