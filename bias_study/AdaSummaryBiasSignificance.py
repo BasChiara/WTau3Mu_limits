@@ -14,7 +14,6 @@ plt.rcParams["figure.figsize"] = (12.5,10)
 def get_options():
     parser = OptionParser()
     parser.add_option('--gen_func',             dest='gen_func', choices=['expo','const', 'poly1'],                 default="expo",          help="wich bkg func to use to generate toys")
-    parser.add_option('--fit_func',             dest='fit_func', choices=['expo','const', 'poly1'],                 default="expo",          help="wich bkg func to use to fit toys")
     parser.add_option('--tag',                  dest='tag',                                                         default='WTau3Mu_A22',   help="Input compiled datacard")
     parser.add_option('--bdt_cut',              dest='bdt_cut',  type=float,                                        default=0.9900,          help="Input compiled datacard")
     parser.add_option('--use-mplhep', dest='use_mplhep', default=False, action="store_true")
@@ -28,9 +27,9 @@ if opt.use_mplhep:
 if not os.path.isdir("plots"): os.system("mkdir plots")
 
 file_dict = {
-    "expo" : 'higgsCombine.gen_%s_fit_expo_%s_bdt%.4f.Significance.mH1.777.root' %(opt.gen_func, opt.tag, opt.bdt_cut),
-    "const": 'higgsCombine.gen_%s_fit_const_%s_bdt%.4f.Significance.mH1.777.root'%(opt.gen_func, opt.tag, opt.bdt_cut),
-    "poly1": 'higgsCombine.gen_%s_fit_poly1_%s_bdt%.4f.Significance.mH1.777.root'%(opt.gen_func, opt.tag, opt.bdt_cut),
+    "expo" : 'higgsCombine.gen_%s_fit_expo_%s.Significance.mH1.777.1234567.root' %(opt.gen_func, opt.tag),
+    "const": 'higgsCombine.gen_%s_fit_const_%s.Significance.mH1.777.1234567.root'%(opt.gen_func, opt.tag),
+    "poly1": 'higgsCombine.gen_%s_fit_poly1_%s.Significance.mH1.777.1234567.root'%(opt.gen_func, opt.tag),
     "envelope":"fit_envelope.root"
 }
 
@@ -141,7 +140,7 @@ axs[0].legend(loc="upper left", fontsize=12, frameon=True)
 axs[0].set_ylim(0.5,1.5)
 axs[0].set_xlim(0,2.5)
 
-axs[0].set_ylabel("Ratio to %s"%opt.gen_func, fontsize=16)
+axs[0].set_ylabel("Ratio to %s"%opt.gen_func, fontsize=18)
 axs[0].set_xlabel("Z-score", fontsize=20)
 
 

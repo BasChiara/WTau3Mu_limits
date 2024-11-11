@@ -29,7 +29,7 @@ elif not os.path.isfile(args.input_datacard) :
 if args.mode == "generate":
 
     print(f'{ct.color_text.BOLD}[GEN]{ct.color_text.END} {args.nToys} toys with bkg {args.gen_func} \t r = {args.r_gen}')  
-    cmd = f'combine -M GenerateOnly -m {tau_mass} -d {args.input_datacard}  --setParameters Mtau={tau_mass} --freezeParameters Mtau,slope --expectSignal {args.r_gen} -n {toy_tag}  --saveToys -t {args.nToys} -s -1\n\n'
+    cmd = f'combine -M GenerateOnly -m {tau_mass} -d {args.input_datacard}  --setParameters Mtau={tau_mass} --freezeParameters Mtau --expectSignal {args.r_gen} -n {toy_tag}  --saveToys -t {args.nToys} -s -1\n\n'
     print(cmd)
     if not args.dry_run : os.system(cmd)
     
@@ -50,6 +50,6 @@ if args.mode == "fit_fixed":
 
     fit_tag = f'.gen_{args.gen_func}_fit_{args.fit_func}_{args.tag}_r{args.r_gen:,.1f}'
     print(f'{ct.color_text.BOLD}[FIT]{ct.color_text.END} {args.nToys} {args.gen_func}-toys with bkg {args.fit_func} \t r = {args.r_gen}')
-    cmd = f'combine -M MultiDimFit {args.input_datacard} -m {tau_mass} --freezeParameters Mtau,slope -t {args.nToys} -n {fit_tag} --expectSignal {args.r_gen} --toysFile {toys_file_name}.root --algo singles --rMin 0.01 --rMax {np.min([10*args.r_gen, 20])} \n\n'
+    cmd = f'combine -M MultiDimFit {args.input_datacard} -m {tau_mass} --freezeParameters Mtau -t {args.nToys} -n {fit_tag} --expectSignal {args.r_gen} --toysFile {toys_file_name} --algo singles --rMin -50 --rMax 50   --saveFitResult \n\n'
     print(cmd)
     if not args.dry_run : os.system(cmd)

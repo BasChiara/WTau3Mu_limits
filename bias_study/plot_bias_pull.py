@@ -62,9 +62,26 @@ if args.method == 'combine':
     f = ROOT.TFile(args.input_root)
     t = f.Get("limit")
 
-    hist_pull = ROOT.TH1F("pull_%s" % name, "truth=%s, fit=%s" % (truth_function, fit_function), 32, -4, 4)
-    hist_pull.GetXaxis().SetTitle("Pull = (r_{truth}-r_{fit})/#sigma_{fit}")
+    # histograms
+    pull_nbins, pull_low, pull_high = 40, -4, 4
+    r_nbins, r_low, r_high = 100, -25, 25
+    sigma_nbins, sigma_low, sigma_high = 25, 0, 5
+
+    hist_pull = ROOT.TH1F("pull_%s" % name, "truth=%s, fit=%s" % (truth_function, fit_function), pull_nbins, pull_low, pull_high)
+    hist_pull.GetXaxis().SetTitle("Pull = (r_{fit}-r_{truth})/#sigma_{fit}")
     hist_pull.GetYaxis().SetTitle("Entries")
+    hist_rfit = ROOT.TH1F("rfit_%s" % name, "truth=%s, fit=%s" % (truth_function, fit_function), r_nbins, r_low, r_high)
+    hist_sigmafit = ROOT.TH1F("sigmafit_%s" % name, "truth=%s, fit=%s" % (truth_function, fit_function), sigma_nbins, sigma_low, sigma_high)
+    hist_rVSsigma_fit = ROOT.TH2F("rVSsigma_fit_%s" % name, "truth=%s, fit=%s" % (truth_function, fit_function), r_nbins, r_low, r_high, sigma_nbins, sigma_low, sigma_high)
+    hist_rVSsigma_fit.GetXaxis().SetTitle("r_{fit}")
+    hist_rVSsigma_fit.GetYaxis().SetTitle("#sigma_{fit}")
+    hist_pullVSr_fit = ROOT.TH2F("pullVSr_fit_%s" % name, "truth=%s, fit=%s" % (truth_function, fit_function), r_nbins, r_low, r_high, pull_nbins, pull_low, pull_high)
+    hist_pullVSr_fit.GetXaxis().SetTitle("r_{fit}")
+    hist_pullVSr_fit.GetYaxis().SetTitle("Pull = (r_{fit}-r_{truth})/#sigma_{fit}")
+    hist_pullVSsigma_fit = ROOT.TH2F("pullVSsigma_fit_%s" % name, "truth=%s, fit=%s" % (truth_function, fit_function), sigma_nbins, sigma_low, sigma_high, pull_nbins, pull_low, pull_high)
+    hist_pullVSsigma_fit.GetXaxis().SetTitle("#sigma_{fit}")
+    hist_pullVSsigma_fit.GetYaxis().SetTitle("Pull = (r_{fit}-r_{truth})/#sigma_{fit}")
+    
 
     sigma_values = np.array([])
     Nfailed = 0
@@ -81,23 +98,18 @@ if args.method == 'combine':
         t.GetEntry(i_toy * 3 + 2)
         r_hi = getattr(t, "r")
 
-        # skip failed fits
+        diff = r_fit - r_truth
+        #sigma = (r_hi - r_lo) / 2
+         # skip failed fits
+        #if sigma > 50:
+        #    Nfailed += 1
+        #    continue
         
-        if r_lo <  1e-5:
-            Nfailed += 1
-            continue
-
-
-        diff = r_truth - r_fit
-        if r_fit < 0.011:
-            sigma = abs(r_hi-r_fit)
-        else:
-            sigma = (r_hi - r_lo) / 2
         # Use uncertainty depending on where mu_truth is relative to mu_fit
-        #if diff > 0:
-        #    sigma = abs(r_hi - r_fit)
-        #else:
-        #    sigma = abs(r_lo - r_fit)
+        if diff > 0:
+            sigma = abs(r_hi - r_fit)
+        else:
+            sigma = abs(r_lo - r_fit)
 
         if sigma != 0:
             sigma_values = np.append(sigma_values, sigma)
@@ -106,10 +118,20 @@ if args.method == 'combine':
 
         if sigma != 0:
             hist_pull.Fill(diff / sigma)
+            hist_rfit.Fill(r_fit)
+            hist_sigmafit.Fill(sigma)
+            hist_rVSsigma_fit.Fill(r_fit, sigma)
+            hist_pullVSr_fit.Fill(r_fit, diff / sigma)
+            hist_pullVSsigma_fit.Fill(sigma, diff / sigma)
     print(f"{ct.color_text.BOLD}[i]{ct.color_text.END} failed fits rate : {Nfailed/N_toys*100:.2f} %")
     # save pull histogram in file
     f_out = ROOT.TFile(args.out_root, 'RECREATE')
     hist_pull.Write()
+    hist_rfit.Write()
+    hist_sigmafit.Write()
+    hist_rVSsigma_fit.Write()
+    hist_pullVSr_fit.Write()
+    hist_pullVSsigma_fit.Write()
     f_out.Close()
 
     # draw pull histogram
@@ -121,22 +143,25 @@ if args.method == 'combine':
     #hist_pull.Fit("gaus")
     # fit with a crystal ball -> account for tails
     pull    = ROOT.RooRealVar("pull", "pull", -4, 4)
+    pull.setRange("fit_range", -2.0, 1.5)
     mean    = ROOT.RooRealVar("mean", "mean", 0, -3, 3)
-    sigma   = ROOT.RooRealVar("sigma", "sigma", 1.5, 0.5, 5)
+    sigma   = ROOT.RooRealVar("sigma", "sigma", 1.0, -5, 5)
     alpha   = ROOT.RooRealVar("alpha", "alpha", 1, -10, 10)
-    n       = ROOT.RooRealVar("n", "n", 10, 0, 1000)
+    n       = ROOT.RooRealVar("n", "n", 10, -300, 300)
     cb      = ROOT.RooCBShape("cb", "cb", pull, mean, sigma, alpha, n)
     gaus    = ROOT.RooGaussian("gaus", "gaus", pull, mean, sigma)
     data    = ROOT.RooDataHist("data", "data", ROOT.RooArgList(pull), hist_pull)
 
     pdf_to_fit = cb if r_truth < 20.0 else gaus
 
-    #pdf_to_fit.fitTo(data)
-    mean = mean.getVal()
-    mean_error = mean.getError()
-    sigma = sigma.getVal()
-    sigma_error = sigma.getError()
-
+    #fit and save results
+    results = pdf_to_fit.fitTo(
+        data,
+        ROOT.RooFit.Range("fit_range"),
+        ROOT.RooFit.Save(),
+        ROOT.RooFit.PrintLevel(-1),
+    )
+    results.Print()
 
     pull_frame = pull.frame()
     data.plotOn(
@@ -145,17 +170,21 @@ if args.method == 'combine':
         ROOT.RooFit.MarkerStyle(20),
     )
     pull_frame.SetTitle(hist_pull.GetTitle())
-    #pdf_to_fit.plotOn(
-    #    pull_frame,
-    #    ROOT.RooFit.LineColor(ROOT.kRed),
-    #    #ROOT.RooFit.MoveToBack(),
-    #)
+    #check if fit converged
+    if results.status() != 0:
+        print(f"{ct.color_text.RED}[ERROR]{ct.color_text.END} fit did not converge")
+    else:
+        pdf_to_fit.plotOn(
+            pull_frame,
+            ROOT.RooFit.LineColor(ROOT.kRed),
+            ROOT.RooFit.MoveToBack(),
+        )
     canv.cd()
     pull_frame.Draw()
     pull_frame.SetTitle(hist_pull.GetTitle())
     pull_frame.GetXaxis().SetTitle(hist_pull.GetXaxis().GetTitle())
     pull_frame.GetYaxis().SetTitle(hist_pull.GetYaxis().GetTitle())
-    chi2_nDoF = 1.0#pull_frame.chiSquare()
+    chi2_nDoF = pull_frame.chiSquare()
     # get fit results
     #fit = hist_pull.GetFunction("gaus")
     #mean = fit.GetParameter(1)
@@ -164,7 +193,7 @@ if args.method == 'combine':
     #sigma_error = fit.GetParError(2)
     #chi2_nDoF = fit.GetChisquare()/fit.GetNDF()
     
-    plot_pulls(canv, name, r_truth, mean=mean, mean_error=mean_error, sigma=sigma, sigma_error=sigma_error, chi2_nDoF=chi2_nDoF)
+    plot_pulls(canv, name, r_truth, mean=mean.getVal() , mean_error=mean.getError(), sigma=sigma.getVal(), sigma_error=sigma.getError(), chi2_nDoF=chi2_nDoF)
 
 elif args.method == 'roofit':
 

@@ -6,6 +6,7 @@ import sys
 import numpy as np
 sys.path.append('..')
 import style.color_text as ct
+import mva.config as config
 
 # --- argument pareser
 parser = utils.get_arguments()
@@ -18,13 +19,34 @@ print('\n')
 
 # --- setup
 category_tag     = f'{args.category}{args.year}'
-toy_tag          = f'.gen{args.nToys/1000:,.0f}K{args.gen_func}_{args.tag}_r{args.r_gen:,.1f}'
+toy_tag          = f'.gen{args.nToys/1000:,.0f}K{args.gen_func}_{args.tag}_bdt{config.wp_dict[args.year][args.category]}' + (f'_r{args.r_gen:,.1f}' if args.r_gen > -1 else '')
 toys_file_name   = f'toys{toy_tag}.root'
 tau_mass     = 1.777
 Ntoy_to_process = args.nToys if args.nFit > args.nToys else args.nFit
 
 out_plot_file = f'fit_results/plotResults_fit{args.fit_func}{toy_tag}.root'
 out_tree_file = f'fit_results/fitResults_fit{args.fit_func}{toy_tag}.root'
+
+# --- get gen S and B yields
+gen_datacard = args.input_datacard.replace(args.fit_func, args.gen_func)
+f_gen = ROOT.TFile(gen_datacard)
+print(f'[INFO] loading gen datacard {gen_datacard}')
+w_gen = f_gen.Get('w')
+if not w_gen :
+    print(f"{ct.color_text.RED}[ERROR]{ct.color_text.END} workspace w not found in {gen_datacard}")
+    exit(1)
+# expected signal yield
+Ns = w_gen.function(f'n_exp_binWTau3Mu_{category_tag}_proc_sig').getVal()
+Ns_exp = args.r_gen * Ns
+print(f'{ct.color_text.BLUE}[S]{ct.color_text.END} number of expected events r * Ns = {Ns_exp:,.1f}')
+# expected background yield
+pdf_b = w_gen.pdf(f'shapeBkg_bkg_WTau3Mu_{category_tag}')
+Nb_exp = w_gen.function(f'n_exp_binWTau3Mu_{category_tag}_proc_bkg').getVal() #exp bkg yield in full region
+Nb_SR_exp = Nb_exp * pdf_b.createIntegral(ROOT.RooArgSet(w_gen.var('tau_fit_mass')), 
+                                          ROOT.RooFit.NormSet(ROOT.RooArgSet(w_gen.var('tau_fit_mass'))), 
+                                          ROOT.RooFit.Range("sig_range")).getVal()
+print(f'{ct.color_text.BLUE}[B]{ct.color_text.END} number of expected events Nb = {Nb_exp:,.1f} --> Nb_SR = {Nb_SR_exp:,.1f}')
+f_gen.Close()
 
 # --- get S+B workspace
 # get workspace from datacard
@@ -39,23 +61,23 @@ mass = w.var('tau_fit_mass')
 # SIGNAL MODEL
 pdf_s = w.pdf(f'shapeSig_sig_WTau3Mu_{category_tag}')
 if not pdf_s :
-    print(f"{ct.color_text.RED}[ERROR]{ct.color_text.END} pdf shapeBkg_bkg_WTau3Mu_{category_tag} not found in {args.input_datacard}")
+    print(f"{ct.color_text.RED}[ERROR]{ct.color_text.END} pdf shapeBkg_sig_WTau3Mu_{category_tag} not found in {args.input_datacard}")
     exit(1)
-# expected signal yield
-Ns = w.function(f'n_exp_binWTau3Mu_{category_tag}_proc_sig').getVal()
-Ns_exp = args.r_gen * Ns
-print(f'{ct.color_text.BLUE}[S]{ct.color_text.END} number of expected events r * Ns = {Ns_exp:,.1f}')
+## expected signal yield
+#Ns = w.function(f'n_exp_binWTau3Mu_{category_tag}_proc_sig').getVal()
+#Ns_exp = args.r_gen * Ns
+#print(f'{ct.color_text.BLUE}[S]{ct.color_text.END} number of expected events r * Ns = {Ns_exp:,.1f}')
 
 # BACKGROUND MODEL
 pdf_b = w.pdf(f'shapeBkg_bkg_WTau3Mu_{category_tag}')
 if not pdf_b :
     print(f"{ct.color_text.RED}[ERROR]{ct.color_text.END} pdf n_exp_binWTau3Mu_{category_tag}_proc_bkg not found in {args.input_datacard}")
     exit(1)
-Nb_exp = w.function(f'n_exp_binWTau3Mu_{category_tag}_proc_bkg').getVal()
-print(f'{ct.color_text.BLUE}[B]{ct.color_text.END} number of expected events Nb = {Nb_exp:,.1f}')
+#Nb_exp = w.function(f'n_exp_binWTau3Mu_{category_tag}_proc_bkg').getVal() #exp bkg yield in full region
+#print(f'{ct.color_text.BLUE}[B]{ct.color_text.END} number of expected events Nb = {Nb_exp:,.1f}')
 
 # FULL MODEL
-Ns_fit = ROOT.RooRealVar('Ns_fit', 'Ns_fit', Ns_exp + 0.5, 0, 10*Ns_exp + 3.0)
+Ns_fit = ROOT.RooRealVar('Ns_fit', 'Ns_fit', -10, 10)#Ns_exp + 0.5, -10*Ns_exp - 3.0, 10*Ns_exp + 3.0)
 Nb_fit = ROOT.RooRealVar('Nb_fit', 'Nb_fit', Nb_exp + 0.5, 0, 10*Nb_exp + 3.0)
 pdf_sb = ROOT.RooAddPdf('pdf_sb', 'pdf_sb', 
                         ROOT.RooArgList(pdf_s, pdf_b), 
@@ -66,6 +88,8 @@ print('\n')
 i_success_toys = np.array([], dtype=int)
 Ns_fit_list, NsE_fit_list = np.array([]), np.array([])
 Nb_fit_list, NbE_fit_list = np.array([]), np.array([])
+N_SR_exp_list = np.array([])
+N_SR_fit_list, N_SR_E_fit_list = np.array([]), np.array([])
 N_failed_fit = 0
 
 # --- loop on toy datasets and fit
@@ -95,6 +119,10 @@ for i in range(1, Ntoy_to_process+1) :
         continue
     i_success_toys = np.append(i_success_toys,i)
     # save fit results
+    #N_SR_exp_list = np.append(N_SR_exp_list, toy_dataset.sumEntries("", "sig_range"))
+    N_SR_exp_list = np.append(N_SR_exp_list, Ns_exp + Nb_SR_exp)
+    N_SR_fit_list = np.append(N_SR_fit_list, 
+                              Ns_fit.getVal()*pdf_s.createIntegral(ROOT.RooArgSet(mass), ROOT.RooFit.NormSet(ROOT.RooArgSet(mass)), ROOT.RooFit.Range("sig_range")).getVal() + Nb_fit.getVal()*pdf_b.createIntegral(ROOT.RooArgSet(mass), ROOT.RooFit.NormSet(ROOT.RooArgSet(mass)), ROOT.RooFit.Range("sig_range")).getVal())
     Ns_fit_list  = np.append(Ns_fit_list,  Ns_fit.getVal())
     NsE_fit_list = np.append(NsE_fit_list, Ns_fit.getError())
     Nb_fit_list  = np.append(Nb_fit_list,  Nb_fit.getVal())
@@ -123,7 +151,7 @@ print(f'{ct.color_text.GREEN}[SUCCESS]{ct.color_text.END} {Ntoy_to_process - N_f
 print(f'{ct.color_text.RED}[FAILED]{ct.color_text.END} {N_failed_fit} fits failed')
 
 # --- save results in tree
-col_names = ['i_toy', 'Ns_gen', 'Ns_fit', 'Ns_fit_err', 'Nb_gen', 'Nb_fit', 'Nb_fit_err', 'r_gen', 'r_fit', 'r_fit_err']
+col_names = ['i_toy', 'Ns_gen', 'Ns_fit', 'Ns_fit_err', 'Nb_gen', 'Nb_fit', 'Nb_fit_err', 'N_SR_fit', 'N_SR_gen', 'r_gen', 'r_fit', 'r_fit_err']
 
 #i_toy = np.array(i_success_toys, dtype=int)
 
@@ -139,6 +167,6 @@ Nb_exp = np.array([Nb_exp]*len(Nb_fit_list), dtype=float)
 #Nb_fit = np.array(Nb_fit_list, dtype=float)
 #Nb_fit_err = np.array(NbE_fit_list, dtype=float)
 
-df = ROOT.RDF.FromNumpy(dict(zip(col_names, [i_success_toys, Ns_exp, Ns_fit_list, NsE_fit_list, Nb_exp, Nb_fit_list, NbE_fit_list, r_gen, r_fit, r_fit_err])))
+df = ROOT.RDF.FromNumpy(dict(zip(col_names, [i_success_toys, Ns_exp, Ns_fit_list, NsE_fit_list, Nb_exp, Nb_fit_list, NbE_fit_list, N_SR_fit_list, N_SR_exp_list,  r_gen, r_fit, r_fit_err])))
 df.Snapshot('fit_results', out_tree_file)
 print(f'{ct.color_text.BOLD}[RESULTS]{ct.color_text.END} fit results saved in {out_tree_file}')

@@ -35,6 +35,14 @@ def get_options():
 toy_tag          = f'.gen{opt.nToys/1000:,.0f}K{opt.gen_func}_{opt.tag}'
 toys_file_name   = f'toys{toy_tag}'
 
+# compile datacard
+compile_cmd = f"text2workspace.py {opt.input_datacard}"
+print(f' - Compiling datacard: {compile_cmd}')
+os.system(compile_cmd)
+if not os.path.exists(opt.input_datacard.replace('.txt','.root')):
+    print(f' - ERROR: datacard not compiled')
+    exit()
+
 # I am not using it
 #if opt.mode == "setup":
 
@@ -63,7 +71,7 @@ toys_file_name   = f'toys{toy_tag}'
 #        json.dump(pdf_index_bf, jf)
 
 if opt.mode == "generate":
-    
+       
     cmd = f'combine -m {opt.MH} -d {opt.input_datacard} -M GenerateOnly --setParameters Mtau={opt.MH} --freezeParameters Mtau --expectSignal 0 -n {toy_tag}  --saveToys -t {opt.nToys} -s -1\n\n'
     print(cmd)
     if not opt.dry_run : os.system(cmd)
@@ -72,9 +80,11 @@ if opt.mode == "generate":
     if not opt.dry_run : os.system(cmd)
 
 if opt.mode == "fixed":
-
+    if not os.path.exists(f'toys/{toys_file_name}.root'):
+        print(f' - ERROR: toys file [{toys_file_name}.root] not found')
+        exit()
     fit_tag = f'.gen_{opt.gen_func}_fit_{opt.fit_func}_{opt.tag}'
-    cmd = f'combine -m {opt.MH} -d {opt.input_datacard} -M Significance --cminDefaultMinimizerStrategy 0 --setParameters Mtau={opt.MH} --expectSignal 0 --freezeParameters Mtau -n {fit_tag} -t {opt.nToys} --toysFile toys/{toys_file_name}.root -s -1\n\n'
+    cmd = f'combine -m {opt.MH} -d {opt.input_datacard} -M Significance --cminDefaultMinimizerStrategy 0 --setParameters Mtau={opt.MH} --expectSignal 0 --freezeParameters Mtau -n {fit_tag} -t {opt.nToys} --toysFile toys/{toys_file_name}.root -s 1234567\n\n'
     print(cmd)
     if not opt.dry_run : os.system(cmd)
 
