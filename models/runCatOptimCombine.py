@@ -4,8 +4,11 @@ import matplotlib.pyplot as plt
 plt.style.use([hep.style.ROOT, hep.style.firamath])
 
 import os
+import sys
 import numpy as np
 import argparse
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+import mva.config as config
 
 # with combineCards.py and flat parameters : set kmax regardless of flat params
 # - fix by manually setting kmax * in datacard
@@ -47,9 +50,11 @@ debug = False
 plot_dir = '/eos/user/c/cbasile/www/Tau3Mu_Run3/categorization/optimize_eta/'
 
 # define points for the categorization scan
-eta_points_AB = np.arange(0.5, 1.2, 0.1)
-eta_points_BC = np.arange(1.5, 2.1, 0.1)
+eta_points_AB = np.arange(0.3, 1.2, 0.1)
+eta_points_BC = np.arange(0.8, 2.1, 0.1)
 cat_points    = np.array(np.meshgrid(eta_points_AB, eta_points_BC)).T.reshape(-1, 2)
+print(f'[*] eta AB points: {eta_points_AB}')
+print(f'[*] eta BC points: {eta_points_BC}')
 cat_name_id_dictionary = {'A':1, 'B':2, 'C':3}
 # check directories with datacards
 combine_dir = f'{args.input_dir}/'
@@ -60,7 +65,7 @@ if not os.path.isdir(combine_dir):
 datacard_name_base = '_'.join([
     f'{combine_dir}/datacard',
     args.datacard_tag,
-    args.year,
+    #args.year,
     f'bdt{args.bdt_cut:,.4f}'
 ])
 tree_name = 'limit'
@@ -73,6 +78,7 @@ if (args.step == 'all' or args.step == 'limit'):
     
     for p, cat_p in enumerate(cat_points):
         if( p+1 > args.stop_after): exit(-1)
+        if (cat_p[1]-cat_p[0] < 0.15): continue
         #cat_p = cat_points[0]
         print(f'[*] eta AB = {cat_p[0]:,.1f} \t eta BC = {cat_p[1]:,.1f}')
         # id_tag for the current working point
@@ -133,6 +139,7 @@ if (args.step == 'all' or args.step == 'merge'):
     
     for cat_p in cat_points:
     #cat_p = cat_points[0]
+        if (cat_p[1]-cat_p[0] < 0.15): continue
         print(f'[*] eta AB = {cat_p[0]:,.1f} \t eta BC = {cat_p[1]:,.1f}')
         cat_p_tag           = f'etaAB{cat_p[0]:,.1f}_BC{cat_p[1]:,.1f}'
         # create temporary root file
@@ -173,7 +180,8 @@ if (args.step == 'all' or args.step == 'merge'):
 if (args.step == 'all' or args.step == 'plot'):
     ROOT.gStyle.SetOptStat(0)
     import cmsstyle as CMS
-    CMS.SetLumi('2022, 34.4')
+    lumi_val = config.LumiVal_plots['20'+args.year]
+    CMS.SetLumi(f'20{args.year}, {lumi_val}')
     CMS.SetEnergy('13.6')
     results_rdf = ROOT.RDataFrame(tree_name, merge_file)
     limit_map   = results_rdf.Filter('quantileExpected==0.5').Profile2D(
@@ -188,6 +196,7 @@ if (args.step == 'all' or args.step == 'plot'):
     limit_map.GetZaxis().SetTitleSize(0.035)
     limit_map.GetZaxis().SetLabelSize(0.035)
     limit_map.GetZaxis().SetLabelOffset(0.005)
+    limit_map.GetZaxis().SetRangeUser(1.10, 1.15)
      
     c = CMS.cmsCanvas(
         'c',
@@ -196,12 +205,12 @@ if (args.step == 'all' or args.step == 'plot'):
         eta_points_BC[0]  - 0.05,
         eta_points_BC[-1] + 0.05,
         "|#eta|_{AB} threshold","|#eta|_{BC} threshold",
-        square=CMS.kSquare,extraSpace=0.03,iPos=0.0,with_z_axis=True,scaleLumi=0.80)
+        square=False,extraSpace=0.03,iPos=0.0,with_z_axis=True,scaleLumi=0.80)
     #c = ROOT.TCanvas('c', 'c', 800, 800)
     c.cd()
     CMS.SetCMSPalette()
     limit_map.SetMarkerColor(ROOT.kWhite)
-    ROOT.gStyle.SetPaintTextFormat("1.3f")
+    ROOT.gStyle.SetPaintTextFormat("1.2f")
     #limit_map.cmsDraw("colz text")
     CMS.cmsDraw(limit_map, 
         'colz text',
@@ -213,22 +222,3 @@ if (args.step == 'all' or args.step == 'plot'):
     
     c.SaveAs(f'{plot_dir}/ULscan_categories_{args.method}_bdt{args.bdt_cut:,.4f}_{args.datacard_tag}.png')
     c.SaveAs(f'{plot_dir}/ULscan_categories_{args.method}_bdt{args.bdt_cut:,.4f}_{args.datacard_tag}.pdf')
-    #hep.cms.label(
-    #    label = "Preliminary",
-    #    data = True, 
-    #    year = 2022,
-    #    lumi = 34.7,
-    #    com  = 13.6, 
-    #    loc=2, 
-    #    ax=ax1)
-    ##ax2 = ax1.twinx()
-    ##limit_value = np.array(limit_value, dtype=float).reshape(-1,2)
-    #ax1.contour(eta_points_AB[0], eta_points_BC[0], limit_value, label =f'expUL ({args.CL*100}% CL)')
-    ##ax2.contour(cat_points, Punzi_S,     'ro--', linewidth=2, markersize=8, label =f'Punzi sig.')
-    ##ax1.set_ylabel(f'exp UL ({args.CL * 100} % CL)')
-    ##ax2.set_ylabel(f'Punzi significance')
-    ##ax1.set_xlabel('BDT threshold')
-    ##ax1.set_xticks(np.arange(args.BDTmin, args.BDTmax, 4*args.BDTstep))
-    #fig.legend(loc='lower left', bbox_to_anchor =(0.15, 0.60))
-    #plt.savefig(f'{args.input_dir}/ULscan_categories_{datacard_tag}.png')
-    #plt.savefig(f'{args.input_dir}/ULscan_categories_{datacard_tag}.pdf')
