@@ -31,7 +31,13 @@ for split in splitting:
     plus_two_sigma.append(rdf_AL['limit'][4])
 
     HN_median.append(rdf_HN['limit'][0])
-    
+
+    # print summary
+    print(f'---- {split} ----')
+    print(f'Expected: {median[-1]:.3f} +{plus_one_sigma[-1]:.3f} -{minus_one_sigma[-1]:.3f}')
+    print(f'Expected HybridNew: {HN_median[-1]:.3f}')
+
+
 
 
 fig, ax = plt.subplots()
@@ -41,10 +47,19 @@ x_error = width*np.ones(len(splitting))
 e_lim = ax.errorbar(x, 
             median, 
             xerr=x_error, 
-            fmt='none', 
+            fmt='o', 
+            mec='k', mfc='k',
             ecolor='k', 
             zorder=10)
 e_lim[-1][0].set_linestyle('--')
+hn_lim = ax.errorbar(x, 
+            HN_median, 
+            xerr=x_error, 
+            fmt='o', 
+            mec='r', mfc='r',
+            ecolor='r', 
+            zorder=10)
+hn_lim[-1][0].set_linestyle('--')
 
 # plot errors as boxes
 for i in range(len(splitting)):
@@ -64,16 +79,10 @@ for i in range(len(splitting)):
                     color = color_text.color_text.CMS_yellow,
                     zorder = 2,              
     )
-hn_lim = ax.errorbar(x, 
-            HN_median, 
-            xerr=x_error, 
-            fmt='none', 
-            ecolor='r', 
-            zorder=10)
-hn_lim[-1][0].set_linestyle('--')
+
 
 ax.legend([e_lim, one_sigma, two_sigma, hn_lim], 
-          ['Expected', 'Expected $\pm 1\sigma$', 'Expected $\pm 2\sigma$', 'HybridNew'], 
+          ['Expected', 'Expected $\pm 1\sigma$', 'Expected $\pm 2\sigma$', 'Expected HybridNew'], 
           loc='upper right', fontsize=14, 
           frameon=False) 
 
@@ -83,4 +92,21 @@ ax.set_xticks(x)
 ax.set_xticklabels(splitting)
 plt.savefig('AL_vs_HN.png')
 
-
+# Hybrid New only
+fig, ax = plt.subplots()
+HN_variation = (HN_median - HN_median[0])/HN_median[0] *100
+hn_lim = ax.errorbar(x, 
+            HN_variation, 
+            xerr=x_error, 
+            fmt='o',
+            mfc='r', mec='r',
+            ecolor='r', 
+            zorder=10)
+hn_lim[-1][0].set_linestyle('--')
+ax.set_ylabel(r'exp UL $Br(\tau \rightarrow 3\mu)$ w.r.t. NOsplit (%)', fontdict={'size': 14})
+ax.set_ylim(-1.0, 1.0)
+ax.legend([hn_lim], ['Expected HybridNew'], loc='upper right', fontsize=14, frameon=False)
+ax.set_xticks(x)
+ax.grid(axis='both')
+ax.set_xticklabels(splitting)
+plt.savefig('AL_vs_HN_zoom.png')

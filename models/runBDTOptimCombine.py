@@ -9,8 +9,9 @@ import numpy as np
 import argparse
 
 import sys
-sys.path.append('/afs/cern.ch/user/c/cbasile/WTau3MuRun3_Analysis/CMSSW_13_0_13/src/Tau3MuAnalysis')
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir)))
 from mva.config import LumiVal_plots 
+import utils.combine_utils as Cutils
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-i', '--input_dir',                                                    default = 'binBDT_LxyS1.5_HLT_overlap_2024Apr29')
@@ -23,6 +24,7 @@ parser.add_argument('-M', '--method',       choices = ['AsymptoticLimits', 'Hybr
 parser.add_argument('-y', '--year',                                                         default = '22')
 parser.add_argument('-c', '--category',                                                     default = 'inclusive')
 parser.add_argument('--CL',                 type =float,                                    default = 0.90)
+parser.add_argument('-q', '--quantileExpected',type =float,                                 default = 0.500)
 parser.add_argument('--stop_after',         type =int,                                      default = 1000)
 parser.add_argument('--BDTmin',             type =float,                                    default = 0.990)
 parser.add_argument('--BDTmax',             type =float,                                    default = 0.9995)
@@ -50,30 +52,35 @@ merge_file = f'{args.input_dir}/Tau3MuCombine.{datacard_tag}_BDTscan.{args.metho
 # 1) compile datacards and calculate limit
 if (args.step == 'all' or args.step == 'limit'):
     print('* compile datacards and calculate limit *')
+    
     for i, cut in enumerate(bdt_cut_list):
         if( i+1 > args.stop_after): exit(-1)
         print(f'[*] BDT > {cut:,.4f}')
+        
         # check datacard
         datacard_name = f'{datacard_name_base}_bdt{cut:,.4f}'
         if not os.path.exists(f'{datacard_name}.txt') :
             print(f'[INFO] cannot find {datacard_name}.txt --> skip this')
             bdt_cut_list = np.delete(bdt_cut_list,np.argwhere(bdt_cut_list==cut))
             continue
+
+        Cutils.fix_nuisances(datacard_name+'.txt')
+        
         # compile
         print(' - compile datacard ')
-        os.system(f'text2workspace.py {datacard_name}.txt' + (' --X-assign-flatParam-prior' if args.method == 'HybridNew' else ''))
+        os.system(f'text2workspace.py {datacard_name}.txt --X-assign-flatParam-prior' )
         if not os.path.exists(f'{datacard_name}.root'):
             print(f'[INFO] cannot find compiled datacard {datacard_name}.root --> skip this')
             bdt_cut_list = np.delete(bdt_cut_list,np.argwhere(bdt_cut_list==cut))
             continue
+        
         # calculate limits
         print(f' - calculate limit with {args.method}')
-        combine_tag = f'{datacard_tag}_bdt{cut:,.4f}.{args.name_combine}'
+        combine_tag = f'{datacard_tag}_bdt{cut:,.4f}' + (f'.{args.name_combine}' if args.name_combine != args.datacard_tag else '')
         if (args.method == 'AsymptoticLimits'):
             limit_cmd = f'combine -M {args.method} {datacard_name}.root -n .{combine_tag} -t -1 --cl {args.CL}'
         elif (args.method == 'HybridNew'):
-            #limit_cmd = f'combine -M {args.method} {datacard_name}.root -n .{combine_tag} --generateNuisances=1 --generateExternalMeasurements=0 --fitNuisances=1 --testStat LHC -T 10000 --rMin 0 --rMax 10 --rule CLs --expectedFromGrid 0.5 --cl {args.CL}'
-            limit_cmd = f'combine -M {args.method} {datacard_name}.root -n .{combine_tag} --LHCmode LHC-limits -T 10000 --rMin 0 --rMax 10 --rule CLs --expectedFromGrid 0.5 --cl {args.CL}'
+            limit_cmd = f'combine -M {args.method} {datacard_name}.root -n .{combine_tag} --LHCmode LHC-limits -T 10000 --rMin -10 --rMax 10 --rule CLs --expectedFromGrid {args.quantileExpected} --cl {args.CL}'
         os.system(limit_cmd) 
         
 
@@ -86,8 +93,8 @@ if (args.step == 'all' or args.step == 'merge'):
 
     for cut in bdt_cut_list:
         print(f'[*] BDT > {cut:,.4f}')
-        bdt_p_tag   = f'{datacard_tag}_bdt{cut:,.4f}'
-        combine_tag = f'{bdt_p_tag}.{args.name_combine}.{args.method}.mH120' + ('.quant0.500' if args.method == 'HybridNew' else '')
+        bdt_p_tag   = f'{datacard_tag}_bdt{cut:,.4f}' + (f'.{args.name_combine}' if args.name_combine != args.datacard_tag else '')
+        combine_tag = f'{bdt_p_tag}.{args.method}.mH120' + ('.quant0.500' if args.method == 'HybridNew' else '')
         
         # crate a temporary .root -> attach scan point info to Combine output
         tmp_file = f'{args.input_dir}/tmp_{bdt_p_tag}.root'
