@@ -1,0 +1,87 @@
+Combination of Run22=input_combine/datacard_VTau3Mu_comb22_apply_LxyS2.0_pTVreweight_expo_bdt0.0000.txt  Run23=input_combine/datacard_VTau3Mu_comb23_apply_LxyS2.0_pTVreweight_expo_bdt0.0000.txt
+imax 6 number of bins
+jmax 1 number of processes minus 1
+kmax * number of nuisance parameters
+----------------------------------------------------------------------------------------------------------------------------------
+shapes bkg       Run22_A   input_combine/wspace_bdt0.9970_VTau3Mu_A22_apply_LxyS2.0_pTVreweight_expo.root wspace_VTau3Mu_A22_apply_LxyS2.0_pTVreweight_expo_bdt0.9970:model_bkg_VTau3Mu_A22
+shapes data_obs  Run22_A   input_combine/wspace_bdt0.9970_VTau3Mu_A22_apply_LxyS2.0_pTVreweight_expo.root wspace_VTau3Mu_A22_apply_LxyS2.0_pTVreweight_expo_bdt0.9970:data_obs
+shapes sig       Run22_A   input_combine/wspace_bdt0.9970_VTau3Mu_A22_apply_LxyS2.0_pTVreweight_expo.root wspace_VTau3Mu_A22_apply_LxyS2.0_pTVreweight_expo_bdt0.9970:model_sig_VTau3Mu_A22
+shapes bkg       Run22_B   input_combine/wspace_bdt0.9960_VTau3Mu_B22_apply_LxyS2.0_pTVreweight_expo.root wspace_VTau3Mu_B22_apply_LxyS2.0_pTVreweight_expo_bdt0.9960:model_bkg_VTau3Mu_B22
+shapes data_obs  Run22_B   input_combine/wspace_bdt0.9960_VTau3Mu_B22_apply_LxyS2.0_pTVreweight_expo.root wspace_VTau3Mu_B22_apply_LxyS2.0_pTVreweight_expo_bdt0.9960:data_obs
+shapes sig       Run22_B   input_combine/wspace_bdt0.9960_VTau3Mu_B22_apply_LxyS2.0_pTVreweight_expo.root wspace_VTau3Mu_B22_apply_LxyS2.0_pTVreweight_expo_bdt0.9960:model_sig_VTau3Mu_B22
+shapes bkg       Run22_C   input_combine/wspace_bdt0.9950_VTau3Mu_C22_apply_LxyS2.0_pTVreweight_expo.root wspace_VTau3Mu_C22_apply_LxyS2.0_pTVreweight_expo_bdt0.9950:model_bkg_VTau3Mu_C22
+shapes data_obs  Run22_C   input_combine/wspace_bdt0.9950_VTau3Mu_C22_apply_LxyS2.0_pTVreweight_expo.root wspace_VTau3Mu_C22_apply_LxyS2.0_pTVreweight_expo_bdt0.9950:data_obs
+shapes sig       Run22_C   input_combine/wspace_bdt0.9950_VTau3Mu_C22_apply_LxyS2.0_pTVreweight_expo.root wspace_VTau3Mu_C22_apply_LxyS2.0_pTVreweight_expo_bdt0.9950:model_sig_VTau3Mu_C22
+shapes bkg       Run23_A   input_combine/wspace_bdt0.9870_VTau3Mu_A23_apply_LxyS2.0_pTVreweight_expo.root wspace_VTau3Mu_A23_apply_LxyS2.0_pTVreweight_expo_bdt0.9870:model_bkg_VTau3Mu_A23
+shapes data_obs  Run23_A   input_combine/wspace_bdt0.9870_VTau3Mu_A23_apply_LxyS2.0_pTVreweight_expo.root wspace_VTau3Mu_A23_apply_LxyS2.0_pTVreweight_expo_bdt0.9870:data_obs
+shapes sig       Run23_A   input_combine/wspace_bdt0.9870_VTau3Mu_A23_apply_LxyS2.0_pTVreweight_expo.root wspace_VTau3Mu_A23_apply_LxyS2.0_pTVreweight_expo_bdt0.9870:model_sig_VTau3Mu_A23
+shapes bkg       Run23_B   input_combine/wspace_bdt0.9960_VTau3Mu_B23_apply_LxyS2.0_pTVreweight_expo.root wspace_VTau3Mu_B23_apply_LxyS2.0_pTVreweight_expo_bdt0.9960:model_bkg_VTau3Mu_B23
+shapes data_obs  Run23_B   input_combine/wspace_bdt0.9960_VTau3Mu_B23_apply_LxyS2.0_pTVreweight_expo.root wspace_VTau3Mu_B23_apply_LxyS2.0_pTVreweight_expo_bdt0.9960:data_obs
+shapes sig       Run23_B   input_combine/wspace_bdt0.9960_VTau3Mu_B23_apply_LxyS2.0_pTVreweight_expo.root wspace_VTau3Mu_B23_apply_LxyS2.0_pTVreweight_expo_bdt0.9960:model_sig_VTau3Mu_B23
+shapes bkg       Run23_C   input_combine/wspace_bdt0.9920_VTau3Mu_C23_apply_LxyS2.0_pTVreweight_expo.root wspace_VTau3Mu_C23_apply_LxyS2.0_pTVreweight_expo_bdt0.9920:model_bkg_VTau3Mu_C23
+shapes data_obs  Run23_C   input_combine/wspace_bdt0.9920_VTau3Mu_C23_apply_LxyS2.0_pTVreweight_expo.root wspace_VTau3Mu_C23_apply_LxyS2.0_pTVreweight_expo_bdt0.9920:data_obs
+shapes sig       Run23_C   input_combine/wspace_bdt0.9920_VTau3Mu_C23_apply_LxyS2.0_pTVreweight_expo.root wspace_VTau3Mu_C23_apply_LxyS2.0_pTVreweight_expo_bdt0.9920:model_sig_VTau3Mu_C23
+----------------------------------------------------------------------------------------------------------------------------------
+bin          Run22_A  Run22_B  Run22_C  Run23_A  Run23_B  Run23_C
+observation  -1       -1       -1       -1       -1       -1     
+----------------------------------------------------------------------------------------------------------------------------------
+bin                               Run22_A  Run22_A  Run22_B  Run22_B  Run22_C  Run22_C  Run23_A  Run23_A  Run23_B  Run23_B  Run23_C  Run23_C
+process                           sig      bkg      sig      bkg      sig      bkg      sig      bkg      sig      bkg      sig      bkg    
+process                           0        1        0        1        0        1        0        1        0        1        0        1      
+rate                              1.9532   13.2486  2.1575   17.4464  0.9113   11.7098  2.761    47.4639  1.7537   14.6727  0.9793   29.5878
+----------------------------------------------------------------------------------------------------------------------------------
+Br_Vmux                 lnN       1.0123   -        1.0123   -        1.0124   -        1.012    -        1.0123   -        1.0123   -      
+Br_Vtaux                lnN       1.0161   -        1.0161   -        1.0163   -        1.0158   -        1.0161   -        1.0162   -      
+HLT_Tau3Mu_             lnN       1.013    -        1.029    -        1.085    -        1.011    -        1.027    -        1.079    -      
+LxyS_cut_A22            lnN       1.023    -        -        -        -        -        -        -        -        -        -        -      
+LxyS_cut_A23            lnN       -        -        -        -        -        -        1.039    -        -        -        -        -      
+LxyS_cut_B22            lnN       -        -        1.007    -        -        -        -        -        -        -        -        -      
+LxyS_cut_B23            lnN       -        -        -        -        -        -        -        -        1.005    -        -        -      
+LxyS_cut_C22            lnN       -        -        -        -        1.043    -        -        -        -        -        -        -      
+LxyS_cut_C23            lnN       -        -        -        -        -        -        -        -        -        -        1.002    -      
+NLO_22                  lnN       1.04     -        1.033    -        1.032    -        -        -        -        -        -        -      
+NLO_23                  lnN       -        -        -        -        -        -        1.039    -        1.033    -        1.031    -      
+PU_22                   lnN       1.02     -        1.027    -        1.037    -        -        -        -        -        -        -      
+PU_23                   lnN       -        -        -        -        -        -        1.014    -        1.022    -        1.022    -      
+lumi22                  lnN       1.014    -        1.014    -        1.014    -        -        -        -        -        -        -      
+lumi23                  lnN       -        -        -        -        -        -        1.013    -        1.013    -        1.013    -      
+mc_stat_A22             lnN       1.005    -        -        -        -        -        -        -        -        -        -        -      
+mc_stat_A23             lnN       -        -        -        -        -        -        1.004    -        -        -        -        -      
+mc_stat_B22             lnN       -        -        1.005    -        -        -        -        -        -        -        -        -      
+mc_stat_B23             lnN       -        -        -        -        -        -        -        -        1.005    -        -        -      
+mc_stat_C22             lnN       -        -        -        -        1.007    -        -        -        -        -        -        -      
+mc_stat_C23             lnN       -        -        -        -        -        -        -        -        -        -        1.006    -      
+mu_mediumID_22          lnN       1.014    -        1.02     -        1.031    -        -        -        -        -        -        -      
+mu_mediumID_23          lnN       -        -        -        -        -        -        1.008    -        1.015    -        1.029    -      
+pT_V_                   lnN       1.002    -        1.002    -        1.003    -        1.002    -        1.002    -        1.003    -      
+xsec_ppVx               lnN       1.0141   -        1.0141   -        1.0142   -        1.0138   -        1.0141   -        1.0141   -      
+width_W_A22   param  0.0124 0.0004
+width_Z_A22   param  0.0125 0.0004
+slope_A22     param  -1.0936 1.5198
+width_W_B22   param  0.0204 0.0001
+width_Z_B22   param  0.0206 0.0002
+slope_B22     param  -2.7908 1.4651
+width_W_C22   param  0.0293 0.0020
+width_Z_C22   param  0.0299 0.0020
+slope_C22     param  -2.4579 1.7421
+width_W_A23   param  0.0129 0.0001
+width_Z_A23   param  0.0129 0.0001
+slope_A23     param  -1.8189 0.8340
+width_W_B23   param  0.0206 0.0008
+width_Z_B23   param  0.0204 0.0008
+slope_B23     param  -0.0491 1.4043
+width_W_C23   param  0.0283 0.0026
+width_Z_C23   param  0.0292 0.0027
+slope_C23     param  0.5957 0.9887
+bkgNorm_A22   flatParam
+bkgNorm_B22   flatParam
+bkgNorm_C22   flatParam
+bkgNorm_A23   flatParam
+bkgNorm_B23   flatParam
+bkgNorm_C23   flatParam
+bkgNorm_A22   rateParam Run22_A bkg 1. [0.43,1.95]
+bkgNorm_B22   rateParam Run22_B bkg 1. [0.49,1.80]
+bkgNorm_C22   rateParam Run22_C bkg 1. [0.41,2.03]
+bkgNorm_A23   rateParam Run23_A bkg 1. [0.67,1.44]
+bkgNorm_B23   rateParam Run23_B bkg 1. [0.45,1.89]
+bkgNorm_C23   rateParam Run23_C bkg 1. [0.59,1.58]

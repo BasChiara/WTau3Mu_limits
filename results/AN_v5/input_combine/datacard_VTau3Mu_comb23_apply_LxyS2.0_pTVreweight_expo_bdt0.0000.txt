@@ -1,0 +1,53 @@
+Combination of A=input_combine/datacard_VTau3Mu_A23_apply_LxyS2.0_pTVreweight_expo_bdt0.9870.txt  B=input_combine/datacard_VTau3Mu_B23_apply_LxyS2.0_pTVreweight_expo_bdt0.9960.txt  C=input_combine/datacard_VTau3Mu_C23_apply_LxyS2.0_pTVreweight_expo_bdt0.9920.txt
+imax 3 number of bins
+jmax 1 number of processes minus 1
+kmax * number of nuisance parameters
+----------------------------------------------------------------------------------------------------------------------------------
+shapes bkg       A         input_combine/wspace_bdt0.9870_VTau3Mu_A23_apply_LxyS2.0_pTVreweight_expo.root wspace_VTau3Mu_A23_apply_LxyS2.0_pTVreweight_expo_bdt0.9870:model_bkg_VTau3Mu_A23
+shapes data_obs  A         input_combine/wspace_bdt0.9870_VTau3Mu_A23_apply_LxyS2.0_pTVreweight_expo.root wspace_VTau3Mu_A23_apply_LxyS2.0_pTVreweight_expo_bdt0.9870:data_obs
+shapes sig       A         input_combine/wspace_bdt0.9870_VTau3Mu_A23_apply_LxyS2.0_pTVreweight_expo.root wspace_VTau3Mu_A23_apply_LxyS2.0_pTVreweight_expo_bdt0.9870:model_sig_VTau3Mu_A23
+shapes bkg       B         input_combine/wspace_bdt0.9960_VTau3Mu_B23_apply_LxyS2.0_pTVreweight_expo.root wspace_VTau3Mu_B23_apply_LxyS2.0_pTVreweight_expo_bdt0.9960:model_bkg_VTau3Mu_B23
+shapes data_obs  B         input_combine/wspace_bdt0.9960_VTau3Mu_B23_apply_LxyS2.0_pTVreweight_expo.root wspace_VTau3Mu_B23_apply_LxyS2.0_pTVreweight_expo_bdt0.9960:data_obs
+shapes sig       B         input_combine/wspace_bdt0.9960_VTau3Mu_B23_apply_LxyS2.0_pTVreweight_expo.root wspace_VTau3Mu_B23_apply_LxyS2.0_pTVreweight_expo_bdt0.9960:model_sig_VTau3Mu_B23
+shapes bkg       C         input_combine/wspace_bdt0.9920_VTau3Mu_C23_apply_LxyS2.0_pTVreweight_expo.root wspace_VTau3Mu_C23_apply_LxyS2.0_pTVreweight_expo_bdt0.9920:model_bkg_VTau3Mu_C23
+shapes data_obs  C         input_combine/wspace_bdt0.9920_VTau3Mu_C23_apply_LxyS2.0_pTVreweight_expo.root wspace_VTau3Mu_C23_apply_LxyS2.0_pTVreweight_expo_bdt0.9920:data_obs
+shapes sig       C         input_combine/wspace_bdt0.9920_VTau3Mu_C23_apply_LxyS2.0_pTVreweight_expo.root wspace_VTau3Mu_C23_apply_LxyS2.0_pTVreweight_expo_bdt0.9920:model_sig_VTau3Mu_C23
+----------------------------------------------------------------------------------------------------------------------------------
+bin          A       B       C     
+observation  -1      -1      -1    
+----------------------------------------------------------------------------------------------------------------------------------
+bin                               A        A        B        B        C        C      
+process                           sig      bkg      sig      bkg      sig      bkg    
+process                           0        1        0        1        0        1      
+rate                              2.761    47.4639  1.7537   14.6727  0.9793   29.5878
+----------------------------------------------------------------------------------------------------------------------------------
+Br_Vmux                 lnN       1.012    -        1.0123   -        1.0123   -      
+Br_Vtaux                lnN       1.0158   -        1.0161   -        1.0162   -      
+HLT_Tau3Mu_             lnN       1.011    -        1.027    -        1.079    -      
+LxyS_cut_A23            lnN       1.039    -        -        -        -        -      
+LxyS_cut_B23            lnN       -        -        1.005    -        -        -      
+LxyS_cut_C23            lnN       -        -        -        -        1.002    -      
+NLO_23                  lnN       1.039    -        1.033    -        1.031    -      
+PU_23                   lnN       1.014    -        1.022    -        1.022    -      
+lumi23                  lnN       1.013    -        1.013    -        1.013    -      
+mc_stat_A23             lnN       1.004    -        -        -        -        -      
+mc_stat_B23             lnN       -        -        1.005    -        -        -      
+mc_stat_C23             lnN       -        -        -        -        1.006    -      
+mu_mediumID_23          lnN       1.008    -        1.015    -        1.029    -      
+pT_V_                   lnN       1.002    -        1.002    -        1.003    -      
+xsec_ppVx               lnN       1.0138   -        1.0141   -        1.0141   -      
+width_W_A23   param  0.0129 0.0001
+width_Z_A23   param  0.0129 0.0001
+slope_A23     param  -1.8189 0.8340
+width_W_B23   param  0.0206 0.0008
+width_Z_B23   param  0.0204 0.0008
+slope_B23     param  -0.0491 1.4043
+width_W_C23   param  0.0283 0.0026
+width_Z_C23   param  0.0292 0.0027
+slope_C23     param  0.5957 0.9887
+bkgNorm_A23   flatParam
+bkgNorm_B23   flatParam
+bkgNorm_C23   flatParam
+bkgNorm_A23   rateParam A bkg 1. [0.67,1.44]
+bkgNorm_B23   rateParam B bkg 1. [0.45,1.89]
+bkgNorm_C23   rateParam C bkg 1. [0.59,1.58]

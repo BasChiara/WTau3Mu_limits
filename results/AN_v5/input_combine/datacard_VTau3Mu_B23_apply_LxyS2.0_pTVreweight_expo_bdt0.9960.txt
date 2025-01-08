@@ -1,0 +1,34 @@
+
+imax 1 number of channels
+jmax * number of background sources
+kmax * number of nuisance parameters
+--------------------------------------------------------------------------------
+shapes bkg         VTau3Mu_B23       wspace_bdt0.9960_VTau3Mu_B23_apply_LxyS2.0_pTVreweight_expo.root wspace_VTau3Mu_B23_apply_LxyS2.0_pTVreweight_expo_bdt0.9960:model_bkg_VTau3Mu_B23
+shapes sig         VTau3Mu_B23       wspace_bdt0.9960_VTau3Mu_B23_apply_LxyS2.0_pTVreweight_expo.root wspace_VTau3Mu_B23_apply_LxyS2.0_pTVreweight_expo_bdt0.9960:model_sig_VTau3Mu_B23
+shapes data_obs    VTau3Mu_B23       wspace_bdt0.9960_VTau3Mu_B23_apply_LxyS2.0_pTVreweight_expo.root wspace_VTau3Mu_B23_apply_LxyS2.0_pTVreweight_expo_bdt0.9960:data_obs
+--------------------------------------------------------------------------------
+bin                VTau3Mu_B23
+observation        -1
+--------------------------------------------------------------------------------
+bin                              VTau3Mu_B23         VTau3Mu_B23
+process                          sig                 bkg
+process                          0                   1
+rate                             1.7537              14.6727
+--------------------------------------------------------------------------------
+lumi23             lnN           1.013               -
+xsec_ppVx           lnN           1.0141               -
+Br_Vmux            lnN           1.0123               -
+Br_Vtaux           lnN           1.0161               -
+mu_mediumID_23       lnN           1.015               -
+NLO_23       lnN           1.033               -
+PU_23       lnN           1.022               -
+mc_stat_B23       lnN           1.005               -
+HLT_Tau3Mu_       lnN           1.027               -
+pT_V_       lnN           1.002               -
+LxyS_cut_B23       lnN           1.005               -
+width_W_B23         param          0.0206     0.0008
+width_Z_B23         param          0.0204     0.0008
+
+bkgNorm_B23       rateParam     VTau3Mu_B23              bkg      1.      [0.45,1.89]
+bkgNorm_B23       flatParam
+slope_B23         param  -0.0491 1.4043

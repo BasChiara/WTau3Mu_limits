@@ -1,0 +1,34 @@
+
+imax 1 number of channels
+jmax * number of background sources
+kmax * number of nuisance parameters
+--------------------------------------------------------------------------------
+shapes bkg         VTau3Mu_A22       wspace_bdt0.9970_VTau3Mu_A22_apply_LxyS2.0_pTVreweight_expo.root wspace_VTau3Mu_A22_apply_LxyS2.0_pTVreweight_expo_bdt0.9970:model_bkg_VTau3Mu_A22
+shapes sig         VTau3Mu_A22       wspace_bdt0.9970_VTau3Mu_A22_apply_LxyS2.0_pTVreweight_expo.root wspace_VTau3Mu_A22_apply_LxyS2.0_pTVreweight_expo_bdt0.9970:model_sig_VTau3Mu_A22
+shapes data_obs    VTau3Mu_A22       wspace_bdt0.9970_VTau3Mu_A22_apply_LxyS2.0_pTVreweight_expo.root wspace_VTau3Mu_A22_apply_LxyS2.0_pTVreweight_expo_bdt0.9970:data_obs
+--------------------------------------------------------------------------------
+bin                VTau3Mu_A22
+observation        -1
+--------------------------------------------------------------------------------
+bin                              VTau3Mu_A22         VTau3Mu_A22
+process                          sig                 bkg
+process                          0                   1
+rate                             1.9532              13.2486
+--------------------------------------------------------------------------------
+lumi22             lnN           1.014               -
+xsec_ppVx           lnN           1.0141               -
+Br_Vmux            lnN           1.0123               -
+Br_Vtaux           lnN           1.0161               -
+mu_mediumID_22       lnN           1.014               -
+NLO_22       lnN           1.040               -
+PU_22       lnN           1.020               -
+mc_stat_A22       lnN           1.005               -
+HLT_Tau3Mu_       lnN           1.013               -
+pT_V_       lnN           1.002               -
+LxyS_cut_A22       lnN           1.023               -
+width_W_A22         param          0.0124     0.0004
+width_Z_A22         param          0.0125     0.0004
+
+bkgNorm_A22       rateParam     VTau3Mu_A22              bkg      1.      [0.43,1.95]
+bkgNorm_A22       flatParam
+slope_A22         param  -1.0936 1.5198
