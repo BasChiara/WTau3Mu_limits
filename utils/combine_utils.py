@@ -3,6 +3,8 @@ import sys
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir)))
 import style.color_text as ct
 
+import ROOT
+
 
 latex_nuisances_names = {
     'Br_Vmux': '$Br(V\\to \\mu \\text{x})$',
@@ -19,6 +21,10 @@ latex_nuisances_names = {
     'width_W': 'signal width W-ch',
     'width_Z': 'signal width Z-ch',
 }
+
+#############################
+#  ---- DATACARS UTILS ---- #
+#############################
 
 def fix_nuisances(datacard):
     with open(datacard, 'r') as f:
@@ -46,6 +52,82 @@ def combineCards_cmd(datacard_list, output, categories_list):
     cmd += f' > {output}.txt'
     
     return cmd
+
+################################
+#  ---- PLOTTING UTILS ---- #
+################################
+
+def plot_sb_model(workspace_file, 
+                  output_dir = None,
+                  tag = '',
+                  n_bins = 65,
+                  verbose = False
+                  ):
+    # output
+    plot_path_name_base = f'{output_dir}/SB_PrePostFit' + (f'_{tag}' if tag else '')
+    # inputs
+    if os.path.isfile(workspace_file):
+        print(f"{ct.color_text.GREEN}[+]{ct.color_text.END} Loading workspace from {workspace_file}")
+        f = ROOT.TFile(workspace_file)
+    else: raise ValueError(f"{ct.color_text.RED} [ERROR] {ct.color_text.END} File {workspace_file} not found")
+    
+    w = f.Get("w")
+    if not w: raise ValueError(f"{ct.color_text.RED} [ERROR] {ct.color_text.END} Workspace not found in {workspace_file}")
+    
+    categories = w.cat("CMS_channel")
+    if verbose:
+        print(f"[+] Categories: ")
+        [print(" - ", cat[0]) for cat in categories]
+
+    binning = ROOT.RooFit.Binning(n_bins)
+    data = w.data("data_obs")
+
+    for cat in categories:
+        print("... processing category ", cat[0])
+        data_cat = data.reduce("CMS_channel==CMS_channel::"+cat[0])
+
+        can = ROOT.TCanvas()
+        plot = w.var("tau_fit_mass").frame()
+        data_cat.plotOn(plot, binning)
+
+        # Load the S+B model
+        w.loadSnapshot("clean")
+        sb_model = w.pdf("model_s").getPdf(cat[0])
+        if not sb_model: raise ValueError(f"{ct.color_text.RED} [ERROR] {ct.color_text.END} signal model pre-fit not found")
+
+        # Prefit
+        #sb_model.plotOn( plot, ROOT.RooFit.LineColor(2), ROOT.RooFit.Name("prefit") )
+        sb_model.plotOn( plot, 
+                        ROOT.RooFit.LineColor(2),
+                        ROOT.RooFit.Name("prefit"))
+
+        # Postfit
+        w.loadSnapshot("MultiDimFit")
+        sb_model.plotOn( plot, 
+                        ROOT.RooFit.LineColor(4), 
+                        ROOT.RooFit.Name("postfit"))
+        r_bestfit = w.var("r").getVal()
+
+        plot.Draw()
+
+        leg = ROOT.TLegend(0.15,0.75,0.45,0.90)
+        leg.SetBorderSize(0)
+        leg.SetTextSize(0.04)
+        leg.AddEntry("prefit", "Prefit S+B (r=1.00)", "L")
+        leg.AddEntry("postfit", "Postfit S+B (r=%.2f)"%r_bestfit, "L")
+        leg.Draw("Same")
+
+        can.Update()
+        can.SaveAs(f"{plot_path_name_base}_{cat[0]}.png")
+        can.SaveAs(f"{plot_path_name_base}_{cat[0]}.pdf")
+        can.Delete()
+    print("r_bestfit = %.2f"%r_bestfit)
+
+    return  0
+
+################################
+#  ---- PUBLICATION UTILS ---- #
+################################
 
 def systematics_Latex_table(datacard, output = None):
 
@@ -105,6 +187,9 @@ def systematics_Latex_table(datacard, output = None):
         print('\\end{table}')
     return 0
 
+def limit_Latex_table(directory, category = 'ABC', year = 22, combine_method = 'HybridNew'):
+
+    return 0
 
 # main
 if __name__ == '__main__':

@@ -80,7 +80,9 @@ if (args.step == 'all' or args.step == 'limit'):
         if (args.method == 'AsymptoticLimits'):
             limit_cmd = f'combine -M {args.method} {datacard_name}.root -n .{combine_tag} -t -1 --cl {args.CL}'
         elif (args.method == 'HybridNew'):
-            limit_cmd = f'combine -M {args.method} {datacard_name}.root -n .{combine_tag} --LHCmode LHC-limits -T 10000 --rMin -10 --rMax 10 --rule CLs --expectedFromGrid {args.quantileExpected} --cl {args.CL}'
+            limit_cmd = f'combine -M {args.method} {datacard_name}.root -n .{combine_tag} --generateNuisances=1 --generateExternalMeasurements=0 --fitNuisances=1 --testStat LHC -T 10000 --rMin -10 --rMax 10 --rule CLs --expectedFromGrid {args.quantileExpected} --cl {args.CL}'
+            #limit_cmd = f'combine -M {args.method} {datacard_name}.root -n .{combine_tag} --LHCmode LHC-limits -T 10000 --rMin -10 --rMax 10 --rule CLs --expectedFromGrid {args.quantileExpected} --cl {args.CL}'
+        print(f' - {limit_cmd}')
         os.system(limit_cmd) 
         
 

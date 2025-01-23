@@ -1,5 +1,0 @@
-#! /bin/bash
-
-combineCards.py A22=datacard_WTau3Mu_A22_bdt994_A22_2024Feb02.txt B22=datacard_WTau3Mu_B22_bdt993_B22_2024Feb02.txt C22=datacard_WTau3Mu_C22_bdt991_C22_2024Feb02.txt >> datacard_WTau3Mu_22_2024Feb02.txt
-#HLT_Double_Mu
-combineCards.py A22=datacard_WTau3Mu_A22_bdt994_A22_2024Feb02.txt B22=datacard_WTau3Mu_B22_bdt993_B22_2024Feb02.txt C22=datacard_WTau3Mu_C22_bdt991_C22_2024Feb02.txt >> datacard_WTau3Mu_22_2024Feb02.txt
