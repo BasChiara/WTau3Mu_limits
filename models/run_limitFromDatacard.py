@@ -13,9 +13,9 @@ parser = argparse.ArgumentParser()
 parser.add_argument('-i', '--input_datacard',                                                help = 'input datacard to feed to combine', required = True)
 parser.add_argument('-w', '--working_dir',                                                  help = 'working directory to store the output', required = True)
 parser.add_argument('-s', '--step',         choices = ['limit', 'merge', 'plot', 'all'],    default = 'all')
-#parser.add_argument('-t', '--process_tag',                                                  help = 'tag for combine outputs', default = 'WTau3Mu_A22')
 parser.add_argument('-n', '--name_combine',                                                 help = 'tag for combine outputs', default = 'WTau3Mu_A22')
 parser.add_argument('-M', '--method',       choices = ['AsymptoticLimits', 'HybridNew'],    default = 'AsymptoticLimits')
+parser.add_argument('-T', '--nToys',                                                        help = 'in HybridNew mode is the number of toys', default = 10000)
 parser.add_argument('--CL',                    type =float,                                 default = 0.90)
 parser.add_argument('-q', '--quantileExpected',type =float,                                 default = 0.500)
 
@@ -53,6 +53,7 @@ if args.step in ['limit', 'all']:
         output_dir = args.working_dir, 
         method = args.method, 
         CL = args.CL, 
-        quantileExpected = args.quantileExpected
+        quantileExpected = args.quantileExpected,
+        n_toys=args.nToys,
     )
     

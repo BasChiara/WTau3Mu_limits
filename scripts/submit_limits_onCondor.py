@@ -98,7 +98,7 @@ WORK_DIR="{workdir}"
 BASE_DIR="{basedir}/models/"
 cd {workdir}
 
-python3 $BASE_DIR/run_limitFromDatacard.py --input_datacard {datacard} -w $WORK_DIR -n .{full_tag} -s all -M {method} --CL 0.90 -q {expQ}
+python3 $BASE_DIR/run_limitFromDatacard.py --input_datacard {datacard} -w $WORK_DIR -n .{full_tag} -s all -M {method} -T {nToys} --CL 0.90 -q {expQ}
 
     '''.format(
         workdir = os.path.abspath(options.workdir),
@@ -106,7 +106,8 @@ python3 $BASE_DIR/run_limitFromDatacard.py --input_datacard {datacard} -w $WORK_
         datacard= os.path.abspath(datacard),
         full_tag= options.tag,
         method  = options.Method,
-        expQ    = quantile
+        expQ    = quantile,
+        nToys   = options.nToys if options.Method == 'HybridNew' else 0,
     )
     )
 
@@ -157,6 +158,8 @@ def main():
     parser.add_option('--process',           choices=['WTau3Mu', 'VTau3Mu'],                    dest='process',         help='which signature')
     parser.add_option('--workdir',           action='store',            dest='workdir',         help='copy the output datacard and .root in the specified path')
     parser.add_option('-M', '--Method',      choices=['AsymptoticLimits', 'HybridNew'],         dest='Method',         help='whcih combine method to use to calculate the limits',              default = 'AsymptoticLimits')
+    parser.add_option('--nToys',             action='store',            dest='nToys',           help='number of toys for HybridNew method',                             default = 10000)
+    parser.add_option('--quantile',          choices=['nominal', '1sigma', '2sigma', 'all'],            dest='quantile',        help='quantile to be used for HybridNew method',                        default = 'nominal')
     parser.add_option('--tag',               action='store',            dest='tag',             help='tag that identifies the task')
     parser.add_option('--category',          choices=['A', 'B', 'C', 'ABC'],   dest='category', help='events category',                                         default = 'A')
     parser.add_option('--year',              choices=['22', '23', 'HL'],      dest='year',            help='data taking year',                                        default = '22')
@@ -183,7 +186,7 @@ def main():
         print(f'[+] working-directory aleardy exists : {opt.workdir}')
     
     # quantile points
-    quantiles = [0.025, 0.160, 0.500, 0.840, 0.975] if opt.Method == 'HybridNew' else [0.500]
+    quantiles = Cutils.quantiles[opt.quantile] if opt.Method == 'HybridNew' else Cutils.quantiles['nominal']
 
     # --> set-up the report directory
     jobdir = f'./{opt.prefix}/ULcalc_{opt.Method}_{opt.category}{opt.year}_{opt.tag}_'+ now.strftime("%Y%m%d_%H%M%S")

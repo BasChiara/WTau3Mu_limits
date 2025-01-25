@@ -22,6 +22,17 @@ latex_nuisances_names = {
     'width_Z': 'signal width Z-ch',
 }
 
+quantiles = {
+    'nominal': 0.500,
+    '1sigma': [0.160, 0.500, 0.840],
+    'minus1sigma': 0.160,
+    'plus1sigma': 0.840,
+    '2sigma': [0.025, 0.500, 0.975],
+    'minus2sigma': 0.025,
+    'plus2sigma': 0.975,
+    'all': [0.025, 0.160, 0.500, 0.840, 0.975],
+}
+
 #############################
 #  ---- DATACARS UTILS ---- #
 #############################
