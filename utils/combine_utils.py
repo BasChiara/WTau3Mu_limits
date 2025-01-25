@@ -53,6 +53,57 @@ def combineCards_cmd(datacard_list, output, categories_list):
     
     return cmd
 
+def compile_datacard(datacard, flat_prior = True, output_dir = None):
+    
+    if not os.path.isfile(datacard):
+        raise ValueError(f"{ct.color_text.RED} [ERROR] {ct.color_text.END} File {datacard} not found")
+        return None
+    if not output_dir:
+        output = datacard.split('.txt')[0] + '.root'
+    else:
+        output = f'{output_dir}/{os.path.basename(datacard).split(".txt")[0]}.root'
+    cmd = f'text2workspace.py {datacard} -o {output} ' + ('--X-assign-flatParam-prior' if flat_prior else '')
+    os.system(cmd)
+    
+    # check if the output file exists
+    if not os.path.isfile(output):
+        raise ValueError(f"{ct.color_text.RED} [ERROR] {ct.color_text.END} File {output} not found")
+        return None
+    else:
+        print(f"{ct.color_text.GREEN}[+]{ct.color_text.END} Compiled datacard {datacard} into {output}")
+        return output
+
+def run_limit(datacard, out_name = 'no_tag', output_dir = None, method = 'AsymptoticLimits', CL = 0.90, quantileExpected = 0.500, n_toys = 10000, rMin = -10, rMax = 10):
+        
+        if not os.path.isfile(datacard):
+            raise ValueError(f"{ct.color_text.RED} [ERROR] {ct.color_text.END} File {datacard} not found")
+            return None
+        
+        output_combine = f'higgsCombine{out_name}.{method}.mH120'
+        
+        cmd = f'combine -M {method} {datacard} -n {out_name} '
+        if method == 'AsymptoticLimits':
+            cmd += f' -t -1 '
+            output_combine += '.root'
+            
+        elif method == 'HybridNew':
+            cmd += f' --generateNuisances=1 --generateExternalMeasurements=0 --fitNuisances=1 --testStat LHC -T {n_toys}  --rule CLs --expectedFromGrid {quantileExpected} '
+
+            output_combine += f'.quant{quantileExpected:.3f}.root'
+        
+        cmd += f' --cl {CL} --rMin {rMin} --rMax {rMax}'
+
+        print(f"{ct.color_text.BOLD} execute {ct.color_text.END} {cmd}")
+        os.system(cmd)
+        # check if the output file exists
+        if os.path.isfile(output_combine):
+            os.system(f'mv {output_combine} {output_dir}')
+            print(f"{ct.color_text.GREEN}[+]{ct.color_text.END} Limit computed and stored in {output_combine}")
+        else:
+            raise ValueError(f"{ct.color_text.RED} [ERROR] {ct.color_text.END} output file {output_combine} not found")
+        
+        return 0
+
 ################################
 #  ---- PLOTTING UTILS ---- #
 ################################

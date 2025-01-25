@@ -86,6 +86,34 @@ python3 $BASE_DIR/runBDTOptimCombine.py -i $COMBINE_DIR -d {full_tag} -n {full_t
     
     return
 
+def setup_executable_singleDatacard(exe_file, datacard, options, bdt_cut = 0.9800, quantile = 0.500):
+    
+    # dump the text datacard
+    with open(exe_file, 'w') as exe:
+        exe.write(
+    '''
+#! /usr/bin/bash
+
+WORK_DIR="{workdir}"
+BASE_DIR="{basedir}/models/"
+cd {workdir}
+
+python3 $BASE_DIR/run_limitFromDatacard.py --input_datacard {datacard} -w $WORK_DIR -n .{full_tag} -s all -M {method} --CL 0.90 -q {expQ}
+
+    '''.format(
+        workdir = os.path.abspath(options.workdir),
+        basedir = os.getcwd(),
+        datacard= os.path.abspath(datacard),
+        full_tag= options.tag,
+        method  = options.Method,
+        expQ    = quantile
+    )
+    )
+
+    os.system(f'chmod +x {exe_file}')
+    
+    return
+
 def write_src_file(src_file, exe_file, workdir):
     with open(src_file, 'w') as src:
             src.write(
@@ -125,12 +153,13 @@ def main():
     parser.add_option('-r', '--runtime',     action='store',     dest='runtime',      help='New runtime for condor resubmission in hours. default None: will take the original one.', default=8, type=int)
     parser.add_option('--scheduler',         action='store',     dest='scheduler',    help='select the batch scheduler (lsf,condor). Default=condor'   , default='condor')
     # application params
-    parser.add_option('--process',           choices=['WTau3Mu', 'VTau3Mu'],            dest='process',         help='which signature')
+    parser.add_option('-i','--input_datacard',dest='input_datacard',                        help='datacard to process',                                  default = None)
+    parser.add_option('--process',           choices=['WTau3Mu', 'VTau3Mu'],                    dest='process',         help='which signature')
     parser.add_option('--workdir',           action='store',            dest='workdir',         help='copy the output datacard and .root in the specified path')
     parser.add_option('-M', '--Method',      choices=['AsymptoticLimits', 'HybridNew'],         dest='Method',         help='whcih combine method to use to calculate the limits',              default = 'AsymptoticLimits')
     parser.add_option('--tag',               action='store',            dest='tag',             help='tag that identifies the task')
     parser.add_option('--category',          choices=['A', 'B', 'C', 'ABC'],   dest='category', help='events category',                                         default = 'A')
-    parser.add_option('--year',              choices=['22', '23'],      dest='year',            help='data taking year',                                        default = '22')
+    parser.add_option('--year',              choices=['22', '23', 'HL'],      dest='year',            help='data taking year',                                        default = '22')
     parser.add_option('--bdt_cut',           action='store',            dest='bdt_cut',         help='BDT value') 
     parser.add_option('--combine_cat',       action='store_true',       dest='combine_cat',           help='set to compute the combined limit also',                                        default = False)
     parser.add_option('--debug',             action='store_true',       dest='debug',           help='useful printouts',                                        default = False)
@@ -143,7 +172,7 @@ def main():
 
     # categories to process
     categories = []
-    if opt.category == 'ABC':
+    if (opt.category == 'ABC' and not opt.input_datacard):
         categories =['A', 'B', 'C']
     else : categories.append(opt.category)
     # --> setup the working directory
@@ -175,12 +204,24 @@ def main():
     for i, job in enumerate(jobs):
         cat = job[0]
         quantile = job[1]
-        # BDT cut value
-        bdt_cut = opt.bdt_cut if opt.bdt_cut else config.wp_dict[opt.year][cat]
 
-        # --> setup the executable
-        executable_file_path = f'{opt.workdir}/{opt.application}_{opt.Method}_{cat}{opt.year}_qExp{quantile}.sh'
-        setup_executable(executable_file_path, cat, opt, bdt_cut = bdt_cut, quantile = quantile)
+        
+        # if datacard is provided use it
+        if opt.input_datacard:
+            executable_file_path = f'{opt.workdir}/{opt.application}_{opt.Method}_{opt.tag}_qExp{quantile}.sh'
+            setup_executable_singleDatacard(
+                executable_file_path, 
+                datacard= opt.input_datacard,
+                options= opt, 
+                quantile = quantile)
+        # else use my custom datacard convention
+        else :
+            # BDT cut value
+            bdt_cut = opt.bdt_cut if opt.bdt_cut else config.wp_dict[opt.year][cat]
+
+            # --> setup the executable
+            executable_file_path = f'{opt.workdir}/{opt.application}_{opt.Method}_{cat}{opt.year}_qExp{quantile}.sh'
+            setup_executable(executable_file_path, cat, opt, bdt_cut = bdt_cut, quantile = quantile)
         # --> setup the command sequence to run
         src_filename = f'{jobdir}/src/submit_{str(i)}.src'
         write_src_file(src_filename, executable_file_path, opt.workdir)
