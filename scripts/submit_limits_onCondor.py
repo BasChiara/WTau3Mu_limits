@@ -186,7 +186,7 @@ def main():
         print(f'[+] working-directory aleardy exists : {opt.workdir}')
     
     # quantile points
-    quantiles = Cutils.quantiles[opt.quantile] if opt.Method == 'HybridNew' else Cutils.quantiles['nominal']
+    quantiles = Cutils.quantiles[opt.quantile] if opt.Method == 'HybridNew' else [Cutils.quantiles['nominal']]
 
     # --> set-up the report directory
     jobdir = f'./{opt.prefix}/ULcalc_{opt.Method}_{opt.category}{opt.year}_{opt.tag}_'+ now.strftime("%Y%m%d_%H%M%S")
