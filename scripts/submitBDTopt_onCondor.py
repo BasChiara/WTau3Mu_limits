@@ -154,7 +154,7 @@ def main():
     parser.add_option('--tag',               action='store',            dest='tag',             help='tag that identifies the task')
     parser.add_option('--plot_outdir',       action='store',            dest='plot_outdir',             help='copy the output plot in the specified EOS path',          default = '')
     parser.add_option('--category',          choices=['A', 'B', 'C', 'ABC'],   dest='category',        help='events category',                                         default = 'A')
-    parser.add_option('--year',              choices=['22', '23'],      dest='year',            help='data taking year',                                        default = '22')
+    parser.add_option('--year',              choices=['22', '23', '24', '24early', '24late'],dest='year',            help='data taking year',                                        default = '22')
     parser.add_option('--BDTmin',            action='store',            dest='BDTmin',          help='minimum BDT value',                                       default = 0.9800) 
     parser.add_option('--BDTmax',            action='store',            dest='BDTmax',          help='maximum BDT value',                                       default = 0.9980)
     parser.add_option('--BDTstep',           action='store',            dest='BDTstep',         help='step for BDT scan',                                       default = 0.0010)
