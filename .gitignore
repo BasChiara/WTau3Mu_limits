@@ -2,7 +2,7 @@
 *.root
 
 #BDT-optimization
-bdt_cut_optimization/binBDT*
+bdt_cut_optimization/*
 
 # results
 results/*

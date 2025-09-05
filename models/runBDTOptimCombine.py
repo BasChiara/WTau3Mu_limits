@@ -196,7 +196,7 @@ if (args.step == 'all' or args.step == 'plot'):
         #exit()
         #ax1.plot(bdt_cut_list[:len(results_np['limit'])], results_np['limit'],              'bo--', linewidth=2, markersize=8, label =f'expUL ({args.CL*100}% CL)')
         ax1.errorbar(bdt_cut_list[:len(results_np['limit'])], results_np['limit'], yerr = results_np['limitErr'], fmt='bo--', linewidth=2, markersize=8, label =f'expUL')
-        ax2.errorbar(sensitivity_np['bdt_cut'], sensitivity_np['PunziS_val'], yerr = sensitivity_np['PunziS_err'], fmt='ro--', linewidth=2, markersize=8, label =f'Punzi signifince')
+        ax2.errorbar(sensitivity_np['bdt_cut'], sensitivity_np['PunziS_val'], yerr = sensitivity_np['PunziS_err'], fmt='ro--', linewidth=2, markersize=8, label =f'Punzi significance')
         ax1.set_ylim(0.8*np.min(results_np['limit']), 1.2*np.max(results_np['limit']))
         ax2.set_ylim(0.05, 0.25 if not args.category == 'C' else 0.20)
         # add text with process info

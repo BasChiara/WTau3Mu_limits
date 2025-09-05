@@ -19,7 +19,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('-i','--inputs',             action='append')
 parser.add_argument('-l','--labels',             action='append')
 parser.add_argument('-x', '--comp_by',           choices=['bdt_cut', 'expNb'],    default='bdt_cut')
-parser.add_argument('--input_sensititvity')
+parser.add_argument('--input_sensitivity')
 parser.add_argument('-o', '--plotout_dir',                                        default = 'WTau3Mu')
 parser.add_argument('-t', '--tag',                                                default = '')
 parser.add_argument('-d', '--datacard_tag',                                       default = 'WTau3Mu')
@@ -95,4 +95,3 @@ for i, g in enumerate(graphs):
 legend.Draw()
 c.SaveAs(f'{plotout_dir}/ULscan_{tag}.png')
 c.SaveAs(f'{plotout_dir}/ULscan_{tag}.pdf')
-

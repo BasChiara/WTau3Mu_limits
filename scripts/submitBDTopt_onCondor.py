@@ -40,30 +40,6 @@ request_memory = 5M
     condor_file.close()
     return condor_file_name
 
-def zip_jobScripts(options):
-
-    fit_script = "/afs/cern.ch/user/c/cbasile/WTau3MuRun3_Analysis/CMSSW_13_0_13/src/Tau3MuAnalysis/models/Tau3Mu_fitSB.py"
-    pwd =  os.getcwd()
-    print(f'[INFO] current path is {pwd}') 
-    opt_script = pwd + "/models/runBDTOptimCombine.py"
-    plt_script = pwd + "/models/compareLimitScan.py"
-
-    # zip the scripts
-    print(f'[...] compressing the scripts')
-    tar_ball_name = f'{options.workdir}/scripts.tar.gz'
-    if not os.path.exists(tar_ball_name):
-        os.system(f'cp {fit_script} {opt_script} {plt_script} .')
-        os.system(f'tar -czvf {tar_ball_name} {os.path.basename(fit_script)} {os.path.basename(opt_script)} {os.path.basename(plt_script)}')
-        if os.path.exists(tar_ball_name):
-            print(f'   OK - tarball created : {tar_ball_name}')
-            os.system(f'rm {os.path.basename(fit_script)} {os.path.basename(opt_script)} {os.path.basename(plt_script)}')
-        else:
-            print(f'[ERROR] problem in creating tarball {tar_ball_name}')
-            exit()
-    else:
-        print('  tarball with scripts already in workdir')
-    
-    return tar_ball_name
 
 
 def setup_executable(exe_file, category, options):
@@ -84,8 +60,6 @@ COMBINE_DIR="$WORK_DIR/input_combine"
 
 EOS_DIR="{eos}"
 YEAR="{year}"
-SIGNAL="{signal}"
-DATA="{data}"
 
 CATEGORY="{cat}"
 
@@ -107,8 +81,6 @@ python3 $BASE_DIR/compareLimitScan.py --inputs input_combine/Tau3MuCombine.{full
         tag     = options.tag,
         eos     = options.plot_outdir,
         year    = options.year,
-        signal  = options.signal,
-        data    = options.data,
         cat     = category,
         full_tag= f'WTau3Mu_{category}{options.year}_{options.tag}',
         bdt_min = options.BDTmin,
@@ -148,8 +120,6 @@ def main():
     parser.add_option('-r', '--runtime',     action='store',     dest='runtime',      help='New runtime for condor resubmission in hours. default None: will take the original one.', default=8, type=int)
     parser.add_option('--scheduler',         action='store',     dest='scheduler',    help='select the batch scheduler (lsf,condor). Default=condor'   , default='condor')
     # application params
-    parser.add_option('-s','--signal',       action='store',            dest='signal',          help='signal sample')
-    parser.add_option('-d','--data',         action='store',            dest='data',            help='data sample')
     parser.add_option('--workdir',           action='store',            dest='workdir',         help='copy the output datacard and .root in the specified path')
     parser.add_option('--tag',               action='store',            dest='tag',             help='tag that identifies the task')
     parser.add_option('--plot_outdir',       action='store',            dest='plot_outdir',             help='copy the output plot in the specified EOS path',          default = '')
@@ -176,8 +146,7 @@ def main():
         print(f'[+] working-directory created : {opt.workdir}')
     else:
         print(f'[+] working-directory aleardy exists : {opt.workdir}')
-    # --> tarball with scripts to run
-    #scripts = zip_jobScripts(opt)
+    
     # --> setup the ouput directory
     if not os.path.isdir(opt.plot_outdir):
         os.system(f'mkdir -p {opt.plot_outdir}')
@@ -213,13 +182,14 @@ def main():
             src.write(
             '''
 #!/bin/bash\n
-cd $COMBINEv10 
+cd {cmssw_base}/src 
 cmsenv
 cd {workdir}
 echo $PWD\n
 source {executable}
     '''.format(
-        workdir = opt.workdir,
+        cmssw_base = os.environ['CMSSW_BASE'] if 'CMSSW_BASE' in os.environ else '',
+        workdir    = os.path.abspath(opt.workdir),
         executable = os.path.basename(executable_file_path),
         )
             )

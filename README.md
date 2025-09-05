@@ -1,4 +1,4 @@
-# WTau3Mu_limits
+# (W)$\tau \to 3 \mu$ - statistical analysis 
 
 ## Installation
 
@@ -9,13 +9,8 @@ To get the letest version of Combine working on el9 run
 cmsrel CMSSW_14_1_0_pre4
 cd CMSSW_14_1_0_pre4/src
 cmsenv
-git clone https://github.com/cms-analysis/HiggsAnalysis-CombinedLimit.git HiggsAnalysis/CombinedLimit
+git -c advice.detachedHead=false clone --depth 1 --branch v10.2.1 https://github.com/cms-analysis/HiggsAnalysis-CombinedLimit.git HiggsAnalysis/CombinedLimit
 cd HiggsAnalysis/CombinedLimit
-```
-```
-cd $CMSSW_BASE/src/HiggsAnalysis/CombinedLimit
-git fetch origin
-git checkout v10.0.1
 scramv1 b clean; scramv1 b # always make a clean build
 ```
 Also download CombineHarvester package running
@@ -26,8 +21,8 @@ scram b
 ### Clone this repository
 Clone this repository and compile with:
 ```
-cd CMSSW_14_1_0_pre4/src/
-git clone git@github.com:BasChiara/WTau3Mu_limits.git
+cd $CMSSW_BASE/src
+git clone git@github.com:BasChiara/WTau3Mu_limits.git -b combine_v10
 cd WTau3Mu_limits
 scram b
 ```
