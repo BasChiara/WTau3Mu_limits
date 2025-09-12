@@ -12,7 +12,7 @@ import numpy as np
 import sys
 #sys.path.append('/afs/cern.ch/user/c/cbasile/WTau3MuRun3_Analysis/CMSSW_13_0_13/src/Tau3MuAnalysis')
 #from mva.config import LumiVal_plots 
-
+NORMALIZE_ = True
 LumiVal_plots = {
     '2022preEE'     : "13.6",
     '2022EE'        : "20.8",
@@ -85,23 +85,31 @@ limit  = lrdf.AsNumpy()['limit']
 argmin_limit = np.argmin(limit)
 bdt_cut = lrdf.AsNumpy()['bdt_cut']
 
-print(f'[INFO] max Punzi {punzi[argmax_punzi]:.3f} at BDT cut {bdt_cut[argmax_punzi]:.3f}')
-print(f'[INFO] min limit {limit[argmin_limit]:.3f} at BDT cut {bdt_cut[argmin_limit]:.3f}')
+# normalize 
+if NORMALIZE_:
+    print("[i] normalizing to max Punzi and min limit")
+    limit = np.array(limit)/np.min(limit)
+    soverrootb = np.array(soverrootb)/np.max(soverrootb)
+    punzi = np.array(punzi)/np.max(punzi)
+
+print(f'[=] max Punzi {punzi[argmax_punzi]:.3f} at BDT cut {bdt_cut[argmax_punzi]:.3f}')
+print(f'[=] min limit {limit[argmin_limit]:.3f} at BDT cut {bdt_cut[argmin_limit]:.3f}')
 # === PLOT ===
 fig, ax1 = plt.subplots(figsize=(10, 8))
 
 # First axis: Limit vs BDT cut
 ax1.set_xlabel("BDT cut")
-ax1.set_ylabel("exp. UL @ 90% CL (x$10^{-7}$)")
+ax1.set_ylabel(r"expected UL/UL$_{min}$ (90% CL)" if NORMALIZE_ else r"exp. UL @ 90% CL (x$10^{-7}$)")
 ax1.plot(bdt_cut, limit, marker='o', linestyle='-', color="blue", label="Exp. UL")
 ax1.tick_params(axis='y')
 ax1.set_xticks(bdt_cut)
 ax1.set_xticklabels([f"{x:.3f}" for x in bdt_cut], rotation=45)
 ax1.text(0.05, 0.75, f'CAT {args.category}', transform=ax1.transAxes, fontsize=25)
+if NORMALIZE_ : ax1.set_ylim(0.90, max(limit)*1.2)
 
 # Second axis: Punzi significance vs BDT cut
 ax2 = ax1.twinx()
-ax2.set_ylabel("Punzi significance")
+ax2.set_ylabel(r"Punzi / Punzi$_{max}$" if NORMALIZE_ else "Punzi significance")
 ax2.plot(bdt_cut, punzi, marker='s', linestyle='--', color="red", label="Punzi")
 ax2.tick_params(axis='y')
 
@@ -117,32 +125,10 @@ lines2, labels2 = ax2.get_legend_handles_labels()
 ax1.legend(lines1 + lines2, labels1 + labels2, loc="upper left")
 
 plt.tight_layout()
-name = f"Limit_Punzi_vs_BDTCut_{tag}.png"
-plt.savefig(name)
-print(f"[INFO] Plot saved as {name}")
-
-# Prepare lists to store values
-#bdt_cuts = []
-#soverrootb = []
-#punzi = []
-#
-## Loop over tree entries
-#for entry in tree:
-#    bdt_cut = entry.bdt_cut
-#    S = entry.sig_Nexp
-#    B = entry.bkg_Nexp_Sregion
-#
-#    # Avoid division by zero
-#    if B > 0: S_over_sqrt_B = S / np.sqrt(B)
-#    else:     S_over_sqrt_B = 0
-#
-#    bdt_cuts.append(bdt_cut)
-#    soverrootb.append(S_over_sqrt_B)
-#    punzi.append(entry.PunziS_val)
-
-# normalize to max
-soverrootb = np.array(soverrootb)/np.max(soverrootb)
-punzi = np.array(punzi)/np.max(punzi)
+name = os.path.join(args.plotout_dir ,f"Limit_Punzi_vs_BDTCut_{tag}")
+plt.savefig(name+".png")
+plt.savefig(name+".pdf")
+print(f"[OUT] Plot saved as {name}")
 
 # Plotting
 plt.figure(figsize=(8,6))
@@ -154,4 +140,7 @@ plt.xticks(bdt_cut, rotation=45)
 plt.grid(True)
 plt.legend()
 plt.tight_layout()
-plt.savefig(f"SoverSqrtB_vs_BDTCut_{tag}.png")
+name = os.path.join(args.plotout_dir ,f"SoverSqrtB_vs_BDTCut_{tag}")
+plt.savefig(name+".png")
+plt.savefig(name+".pdf")
+print(f"[OUT] Plot saved as {name}")
